@@ -10,8 +10,7 @@ import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
 import { SelectivePreload } from './selective-preload';
 
 const appRoutes: Routes = [
-  { path: '',   redirectTo: './home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent},
+  { path: '', component: HomeComponent},
   { path: 'help', component: HelpComponent},
   { path: 'login', component: LoginComponent},
   { path: 'design', component: DesignComponent},
