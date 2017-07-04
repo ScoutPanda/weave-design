@@ -14,6 +14,8 @@ import { HelpComponent } from './help/help.component';
 import { LoginComponent } from './login/login.component';
 import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
 
+import { MyGlobalsService } from './services/myglobals.service';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -29,10 +31,13 @@ import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
     DesignComponent,
     HelpComponent,
     LoginComponent,
-    PatternMakerComponent
+    PatternMakerComponent,
+    MyGlobalsService 
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [
+    AppComponent,
+  ]
 })
 export class AppModule {
   constructor(router: Router){
