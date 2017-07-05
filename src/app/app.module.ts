@@ -32,15 +32,15 @@ import { MyGlobalsService } from './services/myglobals.service';
     HelpComponent,
     LoginComponent,
     PatternMakerComponent,
-    MyGlobalsService 
   ],
-  providers: [],
+  providers: [
+    MyGlobalsService
+  ],
   bootstrap: [
     AppComponent,
   ]
 })
 export class AppModule {
   constructor(router: Router){
-    console.log('Routes: ', JSON.stringify(router.config, undefined, 2));
   }
 }
