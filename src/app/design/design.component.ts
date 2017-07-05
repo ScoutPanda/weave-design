@@ -51,13 +51,17 @@ export class DesignComponent implements OnInit {
     let size = this.globals.getRectSize();
     let shaft = this.globals.getShaft();
     let padding = this.globals.getPadding();
+    let weaveHeight = this.globals.getWeaveHeight();
+    let absoluteHeight = this.globals.getAbsoluteHeight();
+    let weaveWidth = this.globals.getWeaveWidth();
+    let absoluteWidth = this.globals.getAbsoluteWidth();
     for (let a = 0; a < shaft; a++) {
       for (let b = 0; b < shaft; b++) {
         let rect = new Konva.Rect({
-            x: (this.globals.getHeddles() + b) * size + padding * 2,
-            y: (this.globals.getLines() + a) * size + padding * 2,
-            width: size,
-            height: size,
+            x: (heddles + b) * size + padding * 2 +1,
+            y: (lines + a) * size + padding * 2 +1,
+            width: size -2,
+            height: size -2,
             fill: 'red',
             strokeWidth: 1
         });
@@ -67,18 +71,20 @@ export class DesignComponent implements OnInit {
     for (let i = 0; i < shaft + 1; i++) {
       for (let j = 0; j< shaft + 1;j++){
           let yline = new Konva.Line({
-            points: [this.globals.getRectSize()* (i+this.globals.getHeddles()) + 20 , this.globals.getWeaveHeight() + 20, this.globals.getRectSize()*(i+this.globals.getHeddles()) + 20, this.globals.getAbsoluteHeight() - 10],
+            points: [size* (i+heddles) + 20 , weaveHeight + 20, size *(i+heddles) + 20, absoluteHeight - 10],
             stroke: 'gray',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           let xline = new Konva.Line({
-            points: [this.globals.getAbsoluteWidth() - 10 , this.globals.getRectSize()* (j + this.globals.getLines()) + 20, this.globals.getWeaveWidth() + 20, this.globals.getRectSize()* (j + this.globals.getLines()) + 20],
+            points: [absoluteWidth - 10 , size * (j + lines) + 20, weaveWidth + 20, size * (j + lines) + 20],
             stroke: 'gray',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           layer.add(xline)
                .add(yline);
@@ -87,18 +93,23 @@ export class DesignComponent implements OnInit {
   }
 
   private makeVer() {
-    let layer = this.horLayer;
+    let layer = this.resultLayer;
+    let heddles = this.globals.getHeddles();
     let lines = this.globals.getLines();
     let size = this.globals.getRectSize();
     let shaft = this.globals.getShaft();
     let padding = this.globals.getPadding();
+    let weaveHeight = this.globals.getWeaveHeight();
+    let absoluteHeight = this.globals.getWeaveHeight();
+    let weaveWidth = this.globals.getWeaveWidth();
+    let absoluteWidth = this.globals.getAbsoluteWidth();
     for (let a = 0; a < lines; a++) {
       for (let b = 0; b < shaft; b++) {
         let rect = new Konva.Rect({
-            x: (this.globals.getHeddles() + b) * size + padding * 2,
-            y: a * size + padding,
-            width: size,
-            height: size,
+            x: (heddles + b) * size + padding * 2 +1,
+            y: a * size + padding +1,
+            width: size -2,
+            height: size -2,
             fill: 'red',
             strokeWidth: 1
         });
@@ -106,20 +117,22 @@ export class DesignComponent implements OnInit {
       }
     }
     for (let i = 0; i < shaft + 1; i++) {
-      for (let j = 0; j< this.globals.getLines() + 1;j++){
+      for (let j = 0; j< lines + 1;j++){
           let yline = new Konva.Line({
-            points: [this.globals.getRectSize()* (i+this.globals.getHeddles()) + 20 , 10, this.globals.getRectSize()*(i+this.globals.getHeddles()) + 20, this.globals.getWeaveHeight() + 10],
+            points: [size * (i+ heddles) + 20 , 10, size *(i+heddles) + 20, weaveHeight + 10],
             stroke: 'gray',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           let xline = new Konva.Line({
-            points: [this.globals.getAbsoluteWidth() - 10 , this.globals.getRectSize()*j + 10, this.globals.getWeaveWidth() + 20, this.globals.getRectSize()*j + 10],
+            points: [absoluteWidth - 10 , size*j + 10, weaveWidth + 20, size *j + 10],
             stroke: 'gray',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           layer.add(xline)
                .add(yline);
@@ -128,18 +141,23 @@ export class DesignComponent implements OnInit {
   }
 
   private makeHor() {
-    let layer = this.verLayer;
+    let layer = this.resultLayer;
     let heddles = this.globals.getHeddles();
+    let lines = this.globals.getLines();
     let size = this.globals.getRectSize();
     let shaft = this.globals.getShaft();
     let padding = this.globals.getPadding();
+    let weaveHeight = this.globals.getWeaveHeight();
+    let absoluteHeight = this.globals.getAbsoluteHeight();
+    let weaveWidth = this.globals.getWeaveWidth();
+    let absoluteWidth = this.globals.getAbsoluteWidth();
     for (let a = 0; a < shaft; a++) {
       for (let b = 0; b < heddles; b++) {
         let rect = new Konva.Rect({
-            x: b * size + padding,
-            y: (a + this.globals.getLines()) * size + padding * 2,
-            width: size,
-            height: size,
+            x: b * size + padding + 1,
+            y: (a + lines) * size + padding * 2 +1,
+            width: size -2,
+            height: size -2,
             fill: 'red',
             strokeWidth: 1
         });
@@ -149,19 +167,20 @@ export class DesignComponent implements OnInit {
     for (let i = 0; i < heddles + 1; i++) {
       for (let j = 0; j< shaft + 1;j++){
           let yline = new Konva.Line({
-
-            points: [this.globals.getRectSize()* i + 10 , this.globals.getWeaveHeight() + 20, this.globals.getRectSize()*i + 10, this.globals.getAbsoluteHeight() - 10],
+            points: [size * i + 10 , weaveHeight + 20, size*i + 10, absoluteHeight - 10],
             stroke: 'grey',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           let xline = new Konva.Line({
-            points: [10, this.globals.getRectSize()*(j+this.globals.getLines()) + 20, this.globals.getWeaveWidth() + 10, this.globals.getRectSize()*(j + this.globals.getLines()) + 20],
+            points: [10, size*(j+lines) + 20, weaveWidth + 10, size*(j + lines) + 20],
             stroke: 'grey',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           layer.add(xline)
                .add(yline);
@@ -170,20 +189,25 @@ export class DesignComponent implements OnInit {
   }
 
   private makeRects():void {
-    let layer = this.rectLayer;
     let stage = this.stage;
     let rectArr = this.rectArr;
-    let heddles = this.globals.getHeddles();
-    let lines = this.globals.getLines();
-    let rectSize = this.globals.getRectSize();
-    let padding = this.globals.getPadding();
+      let layer = this.resultLayer;
+      let heddles = this.globals.getHeddles();
+      let lines = this.globals.getLines();
+      let size = this.globals.getRectSize();
+      let shaft = this.globals.getShaft();
+      let padding = this.globals.getPadding();
+      let weaveHeight = this.globals.getWeaveHeight();
+      let absoluteHeight = this.globals.getWeaveHeight();
+      let weaveWidth = this.globals.getWeaveWidth();
+      let absoluteWidth = this.globals.getAbsoluteWidth();
     for (let a = 0; a < lines; a++) {
       for (let b = 0; b < heddles; b++) {
         let rect = new Konva.Rect({
-            x: b * rectSize + padding,
-            y: a * rectSize + padding,
-            width: rectSize,
-            height: rectSize,
+            x: b * size + padding +1,
+            y: a * size + padding +1,
+            width: size -2,
+            height: size -2,
             fill: 'red',
             strokeWidth: 1
         });
@@ -196,9 +220,7 @@ export class DesignComponent implements OnInit {
             rectArr[rect.getZIndex()].bool = false;
             this.setFill('red');
           }
-          layer.draw();
-          console.log(rectArr[rect.getZIndex()].bool)
-        console.log(rect.getZIndex())
+          rect.draw();
         });
         rectArr.push({
           bool,
@@ -210,22 +232,33 @@ export class DesignComponent implements OnInit {
   }
 
   private makeCross():void {
-    let layer = this.rectLayer;
+    let layer = this.resultLayer;
+    let heddles = this.globals.getHeddles();
+    let lines = this.globals.getLines();
+    let size = this.globals.getRectSize();
+    let shaft = this.globals.getShaft();
+    let padding = this.globals.getPadding();
+    let weaveHeight = this.globals.getWeaveHeight();
+    let absoluteHeight = this.globals.getWeaveHeight();
+    let weaveWidth = this.globals.getWeaveWidth();
+    let absoluteWidth = this.globals.getAbsoluteWidth();
     for (let i = 0; i < this.globals.getHeddles() + 1; i++) {
       for (let j = 0; j<this.globals.getLines() + 1; j++){
           let yline = new Konva.Line({
-            points: [this.globals.getRectSize()*i + 10 , 10, this.globals.getRectSize()*i + 10, this.globals.getWeaveHeight() + 10],
+            points: [size*i + 10 , 10, size*i + 10, weaveHeight + 10],
             stroke: 'gray',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           let xline = new Konva.Line({
-            points: [10 , this.globals.getRectSize()*j + 10, this.globals.getWeaveWidth() + 10, this.globals.getRectSize()*j + 10],
+            points: [10 , size*j + 10, weaveWidth + 10, size *j + 10],
             stroke: 'gray',
             strokeWidth: 1,
             lineCap: 'round',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            listening: false
           });
           layer.add(xline)
                    .add(yline);
