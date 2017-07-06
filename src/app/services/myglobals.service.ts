@@ -13,11 +13,11 @@ export class MyGlobalsService {
   private shaft;
 
   constructor() {
-    this.rectSize = 20;
-    this.heddles = 10;
-    this.lines = 10;
+    this.rectSize = 10;
+    this.heddles = 300;
+    this.lines = 300;
     this.padding = 10;
-    this.shaft = 3;
+    this.shaft = 10;
     this.weaveWidth = this.heddles * this.rectSize;
     this.weaveHeight = this.lines * this.rectSize;
     this.absoluteWidth = this.weaveWidth + 3 * this.padding + this.shaft * this.rectSize;
