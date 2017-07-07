@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Konva from 'konva';
-import * as SVG from 'svg.js';
+//import * as SVG from 'svg.js';
 
 import { MyGlobalsService } from '../services/myglobals.service';
 
@@ -32,30 +32,35 @@ export class DesignComponent implements OnInit {
   }
 
   public draw(){
-    let canvas=<HTMLCanvasElement>document.getElementById("myCanvas");
+    //window.document.getElementById("canvasContainer").innerHTML = ;
+    let canvas=<HTMLCanvasElement>document.getElementById("nwCanvas");
+    //document.getElementById("nwCanvas").setAttribute("style", "color:red; border: 1px solid blue;");
     let ctx = canvas.getContext("2d");
-    ctx.translate(0.5,0.5)
+    ctx.translate(1,1)
+    ctx.lineWidth=2;
     this.drawRects(0,0,10,10,ctx);
     let array = this.array
-    document.getElementById("myCanvas").addEventListener('click',function(evt){
+    document.getElementById("nwCanvas").addEventListener('click',function(evt){
       console.log(evt.offsetX)
       console.log(evt.offsetY)
-      let x = Math.floor(evt.offsetX / 10) * 10;
-      let y = Math.floor(evt.offsetY / 10) * 10;
-      if(array[x/10][y/10].bool){
-        console.log("hello")
-        ctx.fillStyle = "#4250f4";
-        ctx.fillRect(x,y, 10, 10);
-        ctx.strokeStyle = "#5b5b5b5";
-        ctx.strokeRect(x,y, 10, 10)
-        array[x/10][y/10].bool = false;
-      }
-      else{
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(x,y, 10, 10);
-        ctx.strokeStyle = "#5b5b5b5";
-        ctx.strokeRect(x,y, 10, 10)
-        array[x/10][y/10].bool = true;
+      if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
+          let x = Math.floor(evt.offsetX / 10) * 10;
+          let y = Math.floor(evt.offsetY / 10) * 10;
+          if(array[x/10][y/10].bool){
+            console.log("hello")
+            ctx.fillStyle = "#4250f4";
+            ctx.fillRect(x,y, 10, 10);
+            ctx.strokeStyle = "#5b5b5b5";
+            ctx.strokeRect(x,y, 10, 10)
+            array[x/10][y/10].bool = false;
+          }
+          else{
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(x,y, 10, 10);
+            ctx.strokeStyle = "#5b5b5b5";
+            ctx.strokeRect(x,y, 10, 10)
+            array[x/10][y/10].bool = true;
+          }
       }
     },)
   }
@@ -82,7 +87,7 @@ export class DesignComponent implements OnInit {
     }console.log(array)
   }
 
-  public draw3() {
+  /*public draw3() {
     let draw = SVG('container').size(this.globals.getWeaveHeight(), this.globals.getWeaveWidth());
     let rect: any;
     let rectArr = this.rectArr;
@@ -100,7 +105,7 @@ export class DesignComponent implements OnInit {
       }
     }
     console.log(draw)
-  }
+}*/
 
   public draw2(): void {
     this.stage = new Konva.Stage({
