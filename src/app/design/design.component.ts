@@ -17,6 +17,9 @@ export class DesignComponent implements OnInit {
   private horLayer: Konva.Layer;
   private resultLayer: Konva.Layer;
   private stage: Konva.Stage;
+
+  array: any[];
+
   constructor(
     private globals: MyGlobalsService
   ) {
@@ -25,30 +28,58 @@ export class DesignComponent implements OnInit {
     this.horLayer = new Konva.Layer();
     this.verLayer = new Konva.Layer();
     this.resultLayer = new Konva.Layer();
+    this.array = [];
   }
 
   public draw(){
-    document.getElementById("myCanvas").addEventListener('click',function(evt){
-      let x = Math.floor(evt.offsetX / 10) * 10;
-      let y = Math.floor(evt.offsetY / 10) * 10;
-      console.log(x)
-      console.log(y)
-
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(x + 0.5,y + 0.5, 10, 10);
-      ctx.strokeStyle = "#5b5b5b5";
-      ctx.strokeRect(x + 0.5,y + 0.5, 10, 10)
-    },)
     let canvas=<HTMLCanvasElement>document.getElementById("myCanvas");
     let ctx = canvas.getContext("2d");
-    for (let a = 0; a < 90; a++) {
-      for (let b = 0; b < 90; b++) {
-        ctx.fillStyle = "#666666";
-        ctx.fillRect(b*10 + 0.5,a*10 + 0.5, 10, 10);
+    ctx.translate(0.5,0.5)
+    this.drawRects(0,0,10,10,ctx);
+    let array = this.array
+    document.getElementById("myCanvas").addEventListener('click',function(evt){
+      console.log(evt.offsetX)
+      console.log(evt.offsetY)
+      let x = Math.floor(evt.offsetX / 10) * 10;
+      let y = Math.floor(evt.offsetY / 10) * 10;
+      if(array[x/10][y/10].bool){
+        console.log("hello")
+        ctx.fillStyle = "#4250f4";
+        ctx.fillRect(x,y, 10, 10);
         ctx.strokeStyle = "#5b5b5b5";
-        ctx.strokeRect(b*10 +0.5,a*10 +0.5, 10,10);
+        ctx.strokeRect(x,y, 10, 10)
+        array[x/10][y/10].bool = false;
       }
-    }
+      else{
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(x,y, 10, 10);
+        ctx.strokeStyle = "#5b5b5b5";
+        ctx.strokeRect(x,y, 10, 10)
+        array[x/10][y/10].bool = true;
+      }
+    },)
+  }
+
+  public changeColor(){
+
+  }
+
+  public drawRects(x: number, y: number, width: number, height: number, targetCtx: CanvasRenderingContext2D){
+    //x += 0.5;
+    //y += 0.5;
+    let size: number = this.globals.getRectSize();
+    let array: any = this.array;
+    let bool: boolean = false;
+    for (let a = 0; a < height; a++) {
+      array[a] = [];
+      for (let b = 0; b < width; b++) {
+        targetCtx.fillStyle = "#666666";
+        targetCtx.fillRect(b * size + x, a * size + y, size, size);
+        targetCtx.strokeStyle = "#5b5b5b5";
+        targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        array[a][b] = {bool};
+      }
+    }console.log(array)
   }
 
   public draw3() {
