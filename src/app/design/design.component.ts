@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import * as Konva from 'konva';
-//import * as SVG from 'svg.js';
 
 import { MyGlobalsService } from '../services/myglobals.service';
 
@@ -18,7 +17,7 @@ export class DesignComponent implements OnInit {
   private resultLayer: Konva.Layer;
   private stage: Konva.Stage;
 
-  array: any[];
+  private array: any[];
 
   constructor(
     private globals: MyGlobalsService
@@ -30,39 +29,74 @@ export class DesignComponent implements OnInit {
     this.resultLayer = new Konva.Layer();
     this.array = [];
   }
+  public prepareArray(){
+      let array: any = Array(1000);
+      for (let a = 0; a < 1000; a++) {
+        array[a] = Array(1000);
+        for (let b = 0; b < 1000; b++) {
+          array[a][b] = 0;
+        }
+      }
+      this.array = array;
+  }
 
   public draw(){
+  console.time("koira")
     //window.document.getElementById("canvasContainer").innerHTML = ;
     let canvas=<HTMLCanvasElement>document.getElementById("nwCanvas");
     //document.getElementById("nwCanvas").setAttribute("style", "color:red; border: 1px solid blue;");
     let ctx = canvas.getContext("2d");
     ctx.translate(1,1)
     ctx.lineWidth=2;
-    this.drawRects(0,0,10,10,ctx);
+    //this.prepareArray();
+    this.drawRects(0,0,1000,1000,ctx);
     let array = this.array
     document.getElementById("nwCanvas").addEventListener('click',function(evt){
-      console.log(evt.offsetX)
-      console.log(evt.offsetY)
-      if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
+        console.time("koira");
+      //if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
           let x = Math.floor(evt.offsetX / 10) * 10;
           let y = Math.floor(evt.offsetY / 10) * 10;
-          if(array[x/10][y/10].bool){
-            console.log("hello")
+          if(array[x/10][y/10]){
             ctx.fillStyle = "#4250f4";
             ctx.fillRect(x,y, 10, 10);
             ctx.strokeStyle = "#5b5b5b5";
             ctx.strokeRect(x,y, 10, 10)
-            array[x/10][y/10].bool = false;
+            array[x/10][y/10] = 0;
           }
           else{
             ctx.fillStyle = "#fff";
             ctx.fillRect(x,y, 10, 10);
             ctx.strokeStyle = "#5b5b5b5";
             ctx.strokeRect(x,y, 10, 10)
-            array[x/10][y/10].bool = true;
+            array[x/10][y/10] = 1;
           }
-      }
-    },)
+      //}
+      console.timeEnd("koira");
+  },)
+  console.timeEnd("koira")
+  }
+
+  public drawne(){
+      let canvas=<HTMLCanvasElement>document.getElementById("neCanvas");
+      let ctx = canvas.getContext("2d");
+      ctx.translate(1,1);
+      ctx.lineWidth=2;
+      this.drawRects(0,0,2,10,ctx)
+  }
+
+  public drawsw(){
+      let canvas=<HTMLCanvasElement>document.getElementById("swCanvas");
+      let ctx = canvas.getContext("2d");
+      ctx.translate(1,1);
+      ctx.lineWidth=2;
+      this.drawRects(0,0,10,2,ctx)
+  }
+  public drawse(){
+      let canvas=<HTMLCanvasElement>document.getElementById("seCanvas");
+      let ctx = canvas.getContext("2d");
+      ctx.translate(1,1);
+      ctx.lineWidth=2;
+      this.drawRects(0,0,2,2,ctx)
   }
 
   public changeColor(){
@@ -74,7 +108,6 @@ export class DesignComponent implements OnInit {
     //y += 0.5;
     let size: number = this.globals.getRectSize();
     let array: any = this.array;
-    let bool: boolean = false;
     for (let a = 0; a < height; a++) {
       array[a] = [];
       for (let b = 0; b < width; b++) {
@@ -82,9 +115,9 @@ export class DesignComponent implements OnInit {
         targetCtx.fillRect(b * size + x, a * size + y, size, size);
         targetCtx.strokeStyle = "#5b5b5b5";
         targetCtx.strokeRect(b * size + x, a * size + y, size, size);
-        array[a][b] = {bool};
+        array[a][b] = 0;
       }
-    }console.log(array)
+    }
   }
 
   /*public draw3() {
@@ -252,18 +285,13 @@ export class DesignComponent implements OnInit {
   }
 
   public execute(){
-    console.time('draw')
-    this.rectArr = [];
-    this.resultLayer.destroyChildren();
-    this.horLayer.destroyChildren();
-    this.verLayer.destroyChildren();
-    this.rectLayer.destroyChildren();
-    this.draw2();
-    console.timeEnd('draw')
+    this.draw();
+    this.drawne();
+    this.drawse();
+    this.drawsw();
   }
 
   ngOnInit() {
-    this.draw();
   }
 
 }
