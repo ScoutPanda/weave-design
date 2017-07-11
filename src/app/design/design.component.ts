@@ -18,6 +18,7 @@ export class DesignComponent implements OnInit {
   private stage: Konva.Stage;
 
   private array: any[];
+  private colorArray: any[];
 
   constructor(
     private globals: MyGlobalsService
@@ -28,6 +29,7 @@ export class DesignComponent implements OnInit {
     this.verLayer = new Konva.Layer();
     this.resultLayer = new Konva.Layer();
     this.array = [];
+    this.colorArray = [];
   }
   public prepareArray(){
       let array: any = Array(1000);
@@ -40,33 +42,60 @@ export class DesignComponent implements OnInit {
       this.array = array;
   }
 
+  public prepareColorArray(){
+    let array = this.colorArray;
+    for (let a = 0; a < 2; a++) {
+        array[a] = [];
+        for (let b = 0; b < 10; b++) {
+          if(a===0){
+            array[a][b] = {
+              color: '#f44242'
+            };
+          }else{
+            array[a][b] = {
+              color: '#f44195'
+            }
+          }
+        }
+      }
+    this.colorArray = array;
+    console.log(this.colorArray)
+  }
+
+  public getColor(){
+    return this.colorArray[0].color;
+  }
+
   public draw(){
   console.time("koira")
-    //window.document.getElementById("canvasContainer").innerHTML = ;
+    // window.document.getElementById("canvasContainer").innerHTML = ;
     let canvas=<HTMLCanvasElement>document.getElementById("nwCanvas");
-    //document.getElementById("nwCanvas").setAttribute("style", "color:red; border: 1px solid blue;");
+    // document.getElementById("nwCanvas").setAttribute("style", "color:red; border: 1px solid blue;");
     let ctx = canvas.getContext("2d");
-    ctx.translate(1,1)
-    ctx.lineWidth=2;
-    //this.prepareArray();
-    this.drawRects(0,0,1000,1000,ctx);
-    let array = this.array
-    document.getElementById("nwCanvas").addEventListener('click',function(evt){
+    ctx.translate(1, 1)
+    ctx.lineWidth = 2;
+    this.prepareColorArray();
+    //  this.prepareArray();
+    this.drawRects(0, 0, 10, 10, ctx);
+    let array = this.array;
+    let colorArray = this.colorArray;
+    canvas.addEventListener('click',function(evt){
         console.time("koira");
-      //if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
+      //  if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
           let x = Math.floor(evt.offsetX / 10) * 10;
           let y = Math.floor(evt.offsetY / 10) * 10;
           if(array[x/10][y/10]){
-            ctx.fillStyle = "#4250f4";
+            console.log(colorArray[0][0].color)
+            ctx.fillStyle = colorArray[0][0].color // "#4250f4";
             ctx.fillRect(x,y, 10, 10);
             ctx.strokeStyle = "#5b5b5b5";
             ctx.strokeRect(x,y, 10, 10)
             array[x/10][y/10] = 0;
           }
           else{
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(x,y, 10, 10);
-            ctx.strokeStyle = "#5b5b5b5";
+            ctx.fillStyle = colorArray[1][0].color;
+            ctx.fillRect(x, y, 10, 10);
+            ctx.strokeStyle = '#5b5b5b5';
             ctx.strokeRect(x,y, 10, 10)
             array[x/10][y/10] = 1;
           }
@@ -97,6 +126,51 @@ export class DesignComponent implements OnInit {
       ctx.translate(1,1);
       ctx.lineWidth=2;
       this.drawRects(0,0,2,2,ctx)
+  }
+
+  public drawHorColor(){
+    let canvas=<HTMLCanvasElement>document.getElementById("horColorCanvas");
+      let ctx = canvas.getContext("2d");
+      ctx.translate(1,1);
+      ctx.lineWidth=2;
+      this.drawRects(0,0,1,10,ctx)
+      let colorArray = this.colorArray;
+      canvas.addEventListener('click',function(evt){
+        console.time("koira");
+      //  if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
+          let x = 0;
+          let y = Math.floor(evt.offsetY / 10) * 10;
+          ctx.fillStyle = '#42f465';
+          ctx.fillRect(x, y, 10, 10);
+          ctx.strokeStyle = '#5b5b5b5';
+          ctx.strokeRect(x,y, 10, 10);
+          colorArray[x][y/10].color = '#42f465';
+          
+      //}
+      console.timeEnd("koira");
+  },)
+  }
+
+  public drawVerColor(){
+    let canvas=<HTMLCanvasElement>document.getElementById("verColorCanvas");
+      let ctx = canvas.getContext("2d");
+      ctx.translate(1,1);
+      ctx.lineWidth=2;
+      this.drawRects(0,0,10,1,ctx)
+      let colorArray = this.colorArray;
+      canvas.addEventListener('click',function(evt){
+        console.time("koira");
+      //  if (evt.offsetY >= 0 && evt.offsetY <= 100 && evt.offsetX >= 0 && evt.offsetX <= 100){
+          let x = Math.floor(evt.offsetX / 10) * 10;
+          let y = 0;
+          ctx.fillStyle = '#42f465';
+          ctx.fillRect(x, y, 10, 10);
+          ctx.strokeStyle = '#5b5b5b5';
+          ctx.strokeRect(x,y, 10, 10);
+          colorArray[0][x/10].color = '#42f465';
+      //}
+      console.timeEnd("koira");
+  },)
   }
 
   public changeColor(){
@@ -289,6 +363,8 @@ export class DesignComponent implements OnInit {
     this.drawne();
     this.drawse();
     this.drawsw();
+    this.drawHorColor();
+    this.drawVerColor();
   }
 
   ngOnInit() {
