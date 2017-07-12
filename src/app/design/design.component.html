@@ -3,6 +3,7 @@
 </p>
 <div id="container">
 </div>
+<input [(colorPicker)]="color" (cpToggleChange)="update(color)" [style.background]="color" [value]="color"/>
 <div id="canvasContainerUp">
     <canvas id="nwCanvas" width="102" height="102">
     </canvas>

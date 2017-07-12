@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as Konva from 'konva';
+import { ColorPickerService, ColorPickerModule } from 'angular2-color-picker';
 
 import { MyGlobalsService } from '../services/myglobals.service';
 
@@ -21,7 +22,8 @@ export class DesignComponent implements OnInit {
   private colorArray: any[];
 
   constructor(
-    private globals: MyGlobalsService
+    private globals: MyGlobalsService,
+    private cpService: ColorPickerService,
   ) {
     this.rectArr = [];
     this.rectLayer = new Konva.Layer();
@@ -60,6 +62,10 @@ export class DesignComponent implements OnInit {
       }
     this.colorArray = array;
     console.log(this.colorArray)
+  }
+
+  public update(evt){
+    console.log(evt);
   }
 
   public getColor(){
@@ -359,6 +365,7 @@ export class DesignComponent implements OnInit {
   }
 
   public execute(){
+    console.log(this.cpService.denormalizeRGBA);
     this.draw();
     this.drawne();
     this.drawse();
