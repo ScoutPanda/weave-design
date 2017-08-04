@@ -20,10 +20,10 @@ export class DesignComponent implements OnInit {
   private array: any[];
   private colorArray: any[];
 
-  private heddles: number = 10;
-  private lines: number = 10;
-  private shaft: number = 2;
-  private rectSize: number = 10;
+  public heddles: number = 10;
+  public lines: number = 10;
+  public shaft: number = 2;
+  public rectSize: number = 10;
 
   public executeClicked: boolean;
   ColorOrientation : typeof ColorOrientation = ColorOrientation;
