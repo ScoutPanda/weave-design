@@ -1,24 +1,27 @@
 <p>
   design works!
 </p>
-<div id="container">
-</div>
-<input [(colorPicker)]="color" (cpToggleChange)="update(color)" [style.background]="color" [value]="color"/>
-<div id="canvasContainerUp">
-    <canvas id="nwCanvas" width="102" height="102">
-    </canvas>
-    <canvas id="neCanvas" width="102" height="102">
-    </canvas>
-    <canvas id="horColorCanvas" width="102" height="102">
-    </canvas>
-</div>
-<div id="canvasContainerDown">
-    <canvas id="swCanvas" width="102" height="102">
-    </canvas>
-    <canvas id="seCanvas" width="102" height="102">
-    </canvas>
-    <canvas id="verColorCanvas" width="102" height="102">
-    </canvas>
+<div class="designContainer" [hidden]="!executeClicked">
+  <div id="container">
+    <button [(colorPicker)]="horColor" [style.background]="horColor">Warp</button>
+    <button [(colorPicker)]="verColor" [style.background]="verColor">Weft</button>
+  </div>
+  <div id="canvasContainerUp">
+      <canvas id="nwCanvas" width="102" height="102" (click)="nwCanvasListener($event)">
+      </canvas>
+      <canvas id="neCanvas" width="102" height="102">
+      </canvas>
+      <canvas id="verColorCanvas" width="102" height="102" (click)="colorBarListener($event, false)">
+      </canvas>
+  </div>
+  <div id="canvasContainerDown">
+      <canvas id="swCanvas" width="102" height="102">
+      </canvas>
+      <canvas id="seCanvas" width="102" height="102">
+      </canvas>
+      <canvas style="display:block" id="horColorCanvas" width="102" height="102" (click)="colorBarListener($event, true)">
+      </canvas>
+  </div>
 </div>
 <button (click)="execute()">
   click me

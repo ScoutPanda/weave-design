@@ -13,7 +13,7 @@ import { DesignComponent } from './design/design.component';
 import { HelpComponent } from './help/help.component';
 import { LoginComponent } from './login/login.component';
 import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
-import { ColorPickerModule } from 'angular2-color-picker';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 import { MyGlobalsService } from './services/myglobals.service';
 

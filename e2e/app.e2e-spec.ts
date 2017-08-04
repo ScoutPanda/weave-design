@@ -1,14 +1,14 @@
-import { WeavingAppPage } from './app.po';
+import { WeavingTestPage } from './app.po';
 
-describe('weaving-app App', () => {
-  let page: WeavingAppPage;
+describe('weaving-test App', () => {
+  let page: WeavingTestPage;
 
   beforeEach(() => {
-    page = new WeavingAppPage();
+    page = new WeavingTestPage();
   });
 
-  it('should display message saying app works', () => {
+  it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('app works!');
+    expect(page.getParagraphText()).toEqual('Welcome to app!');
   });
 });

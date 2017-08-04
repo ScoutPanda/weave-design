@@ -7,7 +7,6 @@ import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { DesignComponent } from './design/design.component';
 import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
-import { SelectivePreload } from './selective-preload';
 
 const appRoutes: Routes = [
   { path: '', component: HomeComponent},
@@ -21,15 +20,11 @@ const appRoutes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(
-      appRoutes,
-      { preloadingStrategy: SelectivePreload }
+      appRoutes
     )
   ],
   exports: [
     RouterModule
-  ],
-  providers: [
-    SelectivePreload
   ]
 })
 export class AppRoutingModule { }
