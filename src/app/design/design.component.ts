@@ -20,10 +20,10 @@ export class DesignComponent implements OnInit {
   private array: any[];
   private colorArray: any[];
 
-  private heddles: number;
-  private lines: number;
-  private shaft: number;
-  private rectSize: number;
+  private heddles: number = 10;
+  private lines: number = 10;
+  private shaft: number = 2;
+  private rectSize: number = 10;
 
   public executeClicked: boolean;
   ColorOrientation : typeof ColorOrientation = ColorOrientation;
@@ -43,11 +43,6 @@ export class DesignComponent implements OnInit {
     this.array = [];
     this.colorArray = [];
     this.executeClicked = false;
-
-    this.heddles = 10;
-    this.lines = 5;
-    this.shaft = 2;
-    this.rectSize = 8;
   }
 
   public initCanvas(){
@@ -55,7 +50,6 @@ export class DesignComponent implements OnInit {
     let len = canvasArray.length;
     for(let i = 0; i < len; i++){
       let canvas = <HTMLCanvasElement>canvasArray[i];
-      //console.log(canvasArray[i].id)
       let ctx = canvas.getContext("2d");
       ctx.lineWidth = 2;
       ctx.strokeStyle = '#616161';
@@ -64,9 +58,9 @@ export class DesignComponent implements OnInit {
   
   public prepareArray(){
       let array: any = Array(10);
-      for (let a = 0; a < 10; a++) {
+      for (let a = 0; a < this.heddles; a++) {
         array[a] = Array(10);
-        for (let b = 0; b < 10; b++) {
+        for (let b = 0; b < this.lines; b++) {
           array[a][b] = 0;
         }
       }
@@ -94,7 +88,6 @@ export class DesignComponent implements OnInit {
           }
         }
       }
-    console.log(colorArray)
     this.colorArray = colorArray;
   }
 
@@ -125,14 +118,12 @@ export class DesignComponent implements OnInit {
       ctx.fillRect(xLocation,yLocation, this.rectSize, this.rectSize);
       ctx.strokeRect(xLocation,yLocation, this.rectSize, this.rectSize)
       this.array[y/10][x/10] = 0;
-    console.log(this.array);
     }
     else{
       ctx.fillStyle = this.colorArray[cHor][x/10].color;
       ctx.fillRect(xLocation, yLocation, this.rectSize, this.rectSize);
       ctx.strokeRect(xLocation,yLocation, this.rectSize, this.rectSize)
       this.array[y/10][x/10] = 1;
-    console.log(this.array);
     }
   }
 
@@ -159,7 +150,6 @@ export class DesignComponent implements OnInit {
       ctx.canvas.height = this.shaft * this.rectSize;
       ctx.canvas.width = this.shaft * this.rectSize;
       this.initCanvas();
-      console.log(this.defaultWhite)
       this.drawRects(0,0,this.shaft,this.shaft, this.defaultWhite, ctx)
   }
 
@@ -211,7 +201,7 @@ export class DesignComponent implements OnInit {
   public updateColors(x: number, y: number, indexX: number, indexY:number, isHor: boolean){
     let canvas=<HTMLCanvasElement>document.getElementById("nwCanvas");
     let ctx = canvas.getContext("2d");
-    let size: number = this.globals.getRectSize();
+    let size: number = this.rectSize;
     let height = this.lines;
     let width = this.heddles;
     let array = this.array;
@@ -238,7 +228,7 @@ export class DesignComponent implements OnInit {
   }
 
   public drawRects(x: number, y: number, width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D){
-    let size: number = this.globals.getRectSize();
+    let size: number = this.rectSize;
     for (let a = 0; a < height; a++) {
       for (let b = 0; b < width; b++) {
         targetCtx.fillStyle = rectColor;
@@ -249,7 +239,6 @@ export class DesignComponent implements OnInit {
   }
 
   public execute(){
-    
     this.draw();
     this.drawne();
     this.drawse();
