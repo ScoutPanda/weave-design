@@ -3,8 +3,6 @@ import { ColorPickerService, Rgba } from 'ngx-color-picker';
 
 import { MyGlobalsService } from '../services/myglobals.service';
 
-import { DrawService } from '../shared/draw.service';
-
 enum ColorOrientation {
   ver = 0,
   hor = 1
@@ -23,8 +21,7 @@ interface canvasCtxInterface {
 @Component({
   selector: 'app-design',
   templateUrl: './design.component.html',
-  styleUrls: ['./design.component.css'],
-  providers: [DrawService]
+  styleUrls: ['./design.component.css']
 })
 
 export class DesignComponent implements OnInit {
@@ -56,7 +53,6 @@ export class DesignComponent implements OnInit {
   constructor(
     private globals: MyGlobalsService,
     private cpService: ColorPickerService,
-    private DrawService: DrawService
   ) {}
 
   public initCanvas(){
@@ -121,7 +117,6 @@ export class DesignComponent implements OnInit {
   }
 
   public draw(){
-    // initCanvas temp solution, should refactor all to one function
     this.prepareColorArray();
     this.prepareArray();
 
@@ -195,7 +190,7 @@ export class DesignComponent implements OnInit {
   }
 
   public updateConstructData(indexX: number, indexY: number) {
-
+    
   }
 
   public colorBarListener(evt, isHor: boolean){
@@ -263,8 +258,7 @@ export class DesignComponent implements OnInit {
   }
 
   public execute(){
-    this.DrawService.draw();
-    //this.draw();
+    this.draw();
     this.executeClicked = true
   }
 

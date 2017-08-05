@@ -17,6 +17,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
 
 import { MyGlobalsService } from './services/myglobals.service';
 
+import { TestiService } from './shared/testi.service';
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -34,6 +36,7 @@ import { MyGlobalsService } from './services/myglobals.service';
     HelpComponent,
     LoginComponent,
     PatternMakerComponent,
+    TestiService
   ],
   providers: [
     MyGlobalsService
