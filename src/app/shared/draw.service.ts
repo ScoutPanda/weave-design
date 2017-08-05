@@ -1,9 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ColorPickerService, Rgba } from 'ngx-color-picker';
-
-import { MyGlobalsService } from '../services/myglobals.service';
-
-import { DrawService } from '../shared/draw.service';
 
 enum ColorOrientation {
   ver = 0,
@@ -20,14 +16,9 @@ interface canvasCtxInterface {
   length: number
 }
 
-@Component({
-  selector: 'app-design',
-  templateUrl: './design.component.html',
-  styleUrls: ['./design.component.css'],
-  providers: [DrawService]
-})
+@Injectable()
+export class DrawService {
 
-export class DesignComponent implements OnInit {
   private rectArr: any[] = [];
 
   private array: any[] = [];
@@ -54,9 +45,7 @@ export class DesignComponent implements OnInit {
   public defaultGray: string = "#E0E0E0";
 
   constructor(
-    private globals: MyGlobalsService,
     private cpService: ColorPickerService,
-    private DrawService: DrawService
   ) {}
 
   public initCanvas(){
@@ -195,7 +184,7 @@ export class DesignComponent implements OnInit {
   }
 
   public updateConstructData(indexX: number, indexY: number) {
-
+    
   }
 
   public colorBarListener(evt, isHor: boolean){
@@ -260,16 +249,6 @@ export class DesignComponent implements OnInit {
         targetCtx.strokeRect(b * size + x, a * size + y, size, size);
       }
     }
-  }
-
-  public execute(){
-    this.DrawService.draw();
-    //this.draw();
-    this.executeClicked = true
-  }
-
-  ngOnInit() {
-    this.initCanvas();
   }
 
 }
