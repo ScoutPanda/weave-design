@@ -1,27 +1,3 @@
 <p testi>
   pattern-maker works!
 </p>
-<div canvasContainer></div>
-
-<div class="designContainer" style="display:block" [hidden]="!executeClicked">
-  <div id="container">
-    <button [(colorPicker)]="horColor" [style.background]="horColor">Warp</button>
-    <button [(colorPicker)]="verColor" [style.background]="verColor">Weft</button>
-  </div>
-  <div id="canvasContainerUp">
-      <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="colorBarListener($event, true)">
-      </canvas>
-      <canvas id="swCanvas" width="0" height="0">
-      </canvas>
-      <canvas id="seCanvas" width="0" height="0">
-      </canvas>
-  </div>
-  <div id="canvasContainerDown">
-      <canvas id="nwCanvas" width="0" height="0" (click)="nwCanvasListener($event)">
-      </canvas>
-      <canvas id="neCanvas" width="0" height="0">
-      </canvas>
-      <canvas id="verColorCanvas" width="0" height="0" (click)="colorBarListener($event, false)">
-      </canvas>
-  </div>
-</div>
