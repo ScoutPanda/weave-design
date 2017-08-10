@@ -11,11 +11,12 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { HomeComponent } from './home/home.component';
 import { DesignComponent } from './design/design.component';
 import { HelpComponent } from './help/help.component';
-import { LoginComponent } from './login/login.component';
 import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 
 import { MyGlobalsService } from './services/myglobals.service';
+import { AuthService } from './services/auth.service';
+import { CallbackComponent } from './callback/callback.component';
 
 @NgModule({
   imports: [
@@ -32,11 +33,12 @@ import { MyGlobalsService } from './services/myglobals.service';
     HomeComponent,
     DesignComponent,
     HelpComponent,
-    LoginComponent,
     PatternMakerComponent,
+    CallbackComponent,
   ],
   providers: [
-    MyGlobalsService
+    MyGlobalsService,
+    AuthService
   ],
   bootstrap: [
     AppComponent,

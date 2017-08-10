@@ -11,7 +11,10 @@
   <a [routerLink]=" ['./help']" routerLinkActive="active">
     Help
   </a>
-  <a [routerLink]=" ['./login']" routerLinkActive="active">
-    Log in
-  </a>
+  <button (click)="auth.login()" *ngIf="!auth.loggedIn()">
+        Login
+      </button>
+  <button (click)="auth.logout()" *ngIf="auth.loggedIn()">
+        Logout
+      </button>
 </nav>
