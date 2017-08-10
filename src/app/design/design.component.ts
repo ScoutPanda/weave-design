@@ -40,6 +40,9 @@ export class DesignComponent implements OnInit {
   public shaft: number = 2;
   public rectSize: number = 10;
 
+  public horCPArray: any[] = ['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)'];
+  public verCPArray: any[] = ['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)'];
+
   public executeClicked: boolean = false;
   ColorOrientation : typeof ColorOrientation = ColorOrientation;
 
@@ -113,7 +116,6 @@ export class DesignComponent implements OnInit {
         color: horColor
       };
     }
-    this.colorArray = colorArray;
   }
 
   public draw(){
@@ -166,6 +168,33 @@ export class DesignComponent implements OnInit {
 
   }
 
+  public presetColorSetter(evt, isHor: boolean){
+    if(!evt){
+      if(isHor){
+        let presetArray = this.horCPArray;
+        let len = presetArray.length;
+        let horColor = this.horColor;
+        if(!presetArray.includes(horColor)){
+          presetArray.unshift(horColor);
+          if(len > 5){
+            presetArray.splice(6,1);
+          }
+        }
+      }
+      else {
+        let presetArray = this.verCPArray;
+        let len = presetArray.length;
+        let verColor = this.verColor;
+        if(!presetArray.includes(verColor)){
+          presetArray.unshift(verColor);
+          if(len > 5){
+            presetArray.splice(6,1);
+          }
+        }
+      }
+    }
+  }
+
   public nwCanvasListener(evt){
     let ctx = this.ctxObject[evt.srcElement.id];
     let indexX = Math.floor(evt.offsetX / this.rectSize);
@@ -186,11 +215,6 @@ export class DesignComponent implements OnInit {
       ctx.strokeRect(x,y, this.rectSize, this.rectSize)
       this.array[indexY][indexX] = 1;
     }
-    this.updateConstructData(indexX,indexY)
-  }
-
-  public updateConstructData(indexX: number, indexY: number) {
-    
   }
 
   public colorBarListener(evt, isHor: boolean){

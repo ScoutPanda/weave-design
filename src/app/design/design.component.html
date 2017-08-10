@@ -1,10 +1,10 @@
 <p>
   design works!
 </p>
-<div class="designContainer" style="display:block" [hidden]="!executeClicked">
+<div class="designContainer" [hidden]="!executeClicked">
   <div id="container">
-    <button [(colorPicker)]="horColor" [style.background]="horColor">Warp</button>
-    <button [(colorPicker)]="verColor" [style.background]="verColor">Weft</button>
+    <button [(colorPicker)]="horColor" [style.background]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, true)">Warp</button>
+    <button [(colorPicker)]="verColor" [style.background]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, false)">Weft</button>
   </div>
   <div id="canvasContainerUp">
       <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="colorBarListener($event, true)">
