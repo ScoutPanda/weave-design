@@ -31,11 +31,12 @@ export class AuthService {
   }
 
   logout() {
-    // To log out, we just need to remove
-    // the user's profile and token
     localStorage.removeItem('id_token')
     localStorage.removeItem('accessToken');
     localStorage.removeItem('profile');
+    /*this.lock.logout({
+
+    })*/
     }
 
   loggedIn(): boolean {

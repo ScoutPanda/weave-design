@@ -11,10 +11,12 @@
   <a [routerLink]=" ['./help']" routerLinkActive="active">
     Help
   </a>
-  <button (click)="auth.login()" *ngIf="!auth.loggedIn()">
+  <button (click)="login()" *ngIf="!loggedIn()">
         Login
       </button>
-  <button (click)="auth.logout()" *ngIf="auth.loggedIn()">
+  <button (click)="logout()" *ngIf="loggedIn()">
         Logout
       </button>
+
+      <div (click)="getEmail()">{{email}}</div>
 </nav>

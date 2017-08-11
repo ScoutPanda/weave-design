@@ -9,6 +9,8 @@ import { AuthService } from '../services/auth.service';
 })
 export class NavbarComponent implements OnInit {
 
+  public email: string = 'koira';
+
   constructor(private auth: AuthService) { }
 
   login() {
@@ -16,6 +18,20 @@ export class NavbarComponent implements OnInit {
   }
   logout() {
     this.auth.logout();
+  }
+
+  getEmail(){
+    let profile = localStorage.getItem("profile");
+    if (profile != null){
+      profile = JSON.parse(profile);
+      this.email = profile['email'];
+    }else{
+      this.email = 'koira';
+    }
+  }
+
+  loggedIn(){
+    return this.auth.loggedIn();
   }
 
   ngOnInit() {
