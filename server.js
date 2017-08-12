@@ -4,7 +4,7 @@ const express = require('express');
 var bodyParser = require('body-parser');
 
 const canvas = require('./backend/routes/canvas');
-const canvas = require('./backend/routes/adduser');
+const adduser = require('./backend/routes/adduser');
 
 const mongoose = require('mongoose')
 
@@ -48,7 +48,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.use('/api/canvas', canvas);
-app.use('/api/adduser', canvas);
+app.use('/api/adduser', adduser);
 
 //require('./backend/routes')(app);
 
