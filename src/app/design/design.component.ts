@@ -3,6 +3,11 @@ import { ColorPickerService, Rgba } from 'ngx-color-picker';
 
 import { MyGlobalsService } from '../services/myglobals.service';
 
+import { CanvasService } from '../services/canvas.service';
+
+import { CanvasModel } from '../services/canvas.model';
+import { CanvasDataModel } from '../services/canvasdata.model'; 
+
 enum ColorOrientation {
   ver = 0,
   hor = 1
@@ -56,6 +61,7 @@ export class DesignComponent implements OnInit {
   constructor(
     private globals: MyGlobalsService,
     private cpService: ColorPickerService,
+    private canvasService: CanvasService
   ) {}
 
   public initCanvas(){
@@ -195,6 +201,20 @@ export class DesignComponent implements OnInit {
     }
   }
 
+  public koira(){
+    console.log(localStorage.getItem('profile'))
+  }
+
+  public save(){
+    const canvasData = new CanvasDataModel(this.colorArray[0], this.colorArray[1]);
+    const canvas = new CanvasModel('koira', JSON.stringify(canvasData));
+    this.canvasService.addCanvas(canvas)
+        .subscribe(
+          data => console.log(data),
+          error => console.log(error)
+        )
+  }
+
   public nwCanvasListener(evt){
     let ctx = this.ctxObject[evt.srcElement.id];
     let indexX = Math.floor(evt.offsetX / this.rectSize);
@@ -285,8 +305,14 @@ export class DesignComponent implements OnInit {
     this.draw();
     this.executeClicked = true
   }
-
+  private canvases: CanvasModel[];
   ngOnInit() {
+    this.canvasService.getCanvas()
+      .subscribe((
+        canvases: CanvasModel[]) => {
+          this.canvases = canvases;
+        }
+      );
     this.initCanvas();
   }
 

@@ -7,11 +7,14 @@ declare var Auth0Lock: any;
 export class AuthService {
 
   lock = new Auth0Lock('07yOOxsIRAqf2z09zMuF7mdKDpFQUvra', 'weave-design.eu.auth0.com', {
+    loginAfterSignUp: false,
     auth: {
       //redirect: false
       //redirectUrl: 'http://localhost:4200/callback'
     }
   })
+
+  private koira;
 
   constructor() { 
     this.lock.on("authenticated", authResult => {
@@ -22,6 +25,9 @@ export class AuthService {
         localStorage.setItem('id_token', authResult.idToken);
         localStorage.setItem('accessToken', authResult.accessToken);
         localStorage.setItem('profile', JSON.stringify(profile));
+        localStorage.setItem('email', profile.email);
+        console.log(profile)
+        console.log(authResult.accessToken)
       });
     });
   }

@@ -15,6 +15,7 @@ import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
 import { ColorPickerModule } from 'ngx-color-picker';
 
 import { MyGlobalsService } from './services/myglobals.service';
+import { CanvasService } from './services/canvas.service';
 import { AuthService } from './services/auth.service';
 import { CallbackComponent } from './callback/callback.component';
 
@@ -38,7 +39,8 @@ import { CallbackComponent } from './callback/callback.component';
   ],
   providers: [
     MyGlobalsService,
-    AuthService
+    AuthService,
+    CanvasService
   ],
   bootstrap: [
     AppComponent,
