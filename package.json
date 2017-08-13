@@ -38,6 +38,7 @@
     "body-parser": "^1.17.2",
     "core-js": "^2.4.1",
     "express": "^4.15.3",
+    "jsonwebtoken": "^7.4.2",
     "konva": "^1.6.3",
     "mongoose": "^4.11.6",
     "mongoose-unique-validator": "^1.0.5",

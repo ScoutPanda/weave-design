@@ -14,8 +14,6 @@ export class AuthService {
     }
   })
 
-  private koira;
-
   constructor() { 
     this.lock.on("authenticated", authResult => {
       this.lock.getUserInfo(authResult.accessToken, function (error, profile){
@@ -26,8 +24,6 @@ export class AuthService {
         localStorage.setItem('accessToken', authResult.accessToken);
         localStorage.setItem('profile', JSON.stringify(profile));
         localStorage.setItem('email', profile.email);
-        console.log(profile)
-        console.log(authResult.accessToken)
       });
     });
   }
@@ -40,10 +36,15 @@ export class AuthService {
     localStorage.removeItem('id_token')
     localStorage.removeItem('accessToken');
     localStorage.removeItem('profile');
+    localStorage.removeItem('email');
     /*this.lock.logout({
 
     })*/
-    }
+  }
+
+  getUser(){
+    
+  }
 
   loggedIn(): boolean {
     return tokenNotExpired("id_token");

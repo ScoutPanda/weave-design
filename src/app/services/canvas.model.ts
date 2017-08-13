@@ -5,6 +5,6 @@ export class CanvasModel {
         public canvasName: string,
         public canvasData: string,
         public canvasId?: string,
-        public userId?: string
+        public authUserId?: string
     ){}
 }

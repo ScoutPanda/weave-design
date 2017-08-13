@@ -3,6 +3,8 @@ import { ColorPickerService, Rgba } from 'ngx-color-picker';
 
 import { MyGlobalsService } from '../services/myglobals.service';
 
+import { AuthService } from '../services/auth.service';
+
 import { CanvasService } from '../services/canvas.service';
 
 import { CanvasModel } from '../services/canvas.model';
@@ -59,6 +61,7 @@ export class DesignComponent implements OnInit {
   public defaultGray: string = "#E0E0E0";
 
   constructor(
+    private auth: AuthService,
     private globals: MyGlobalsService,
     private cpService: ColorPickerService,
     private canvasService: CanvasService
@@ -215,6 +218,10 @@ export class DesignComponent implements OnInit {
         )
   }
 
+  public loggedIn(){
+    return this.auth.loggedIn()
+  }
+
   public nwCanvasListener(evt){
     let ctx = this.ctxObject[evt.srcElement.id];
     let indexX = Math.floor(evt.offsetX / this.rectSize);
@@ -305,14 +312,8 @@ export class DesignComponent implements OnInit {
     this.draw();
     this.executeClicked = true
   }
-  private canvases: CanvasModel[];
+
   ngOnInit() {
-    this.canvasService.getCanvas()
-      .subscribe((
-        canvases: CanvasModel[]) => {
-          this.canvases = canvases;
-        }
-      );
     this.initCanvas();
   }
 

@@ -18,6 +18,8 @@ import { MyGlobalsService } from './services/myglobals.service';
 import { CanvasService } from './services/canvas.service';
 import { AuthService } from './services/auth.service';
 import { CallbackComponent } from './callback/callback.component';
+import { UserComponent } from './user/user.component';
+import { CanvasListComponent } from './user/canvas-list.component';
 
 @NgModule({
   imports: [
@@ -36,6 +38,8 @@ import { CallbackComponent } from './callback/callback.component';
     HelpComponent,
     PatternMakerComponent,
     CallbackComponent,
+    UserComponent,
+    CanvasListComponent
   ],
   providers: [
     MyGlobalsService,

@@ -9,7 +9,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class NavbarComponent implements OnInit {
 
-  public email: string = 'koira';
+  public email: string = '';
 
   constructor(private auth: AuthService) { }
 
@@ -21,13 +21,16 @@ export class NavbarComponent implements OnInit {
   }
 
   getEmail(){
-    let profile = localStorage.getItem("profile");
-    if (profile != null){
-      profile = JSON.parse(profile);
-      this.email = profile['email'];
+    let email = localStorage.getItem("email");
+    if (email != null){
+      this.email = email;
     }else{
-      this.email = 'koira';
+      this.email = '';
     }
+  }
+
+  getUserId(){
+    return localStorage.getItem("id_token");
   }
 
   loggedIn(){
