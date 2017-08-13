@@ -7,16 +7,16 @@ import { CanvasModel } from '../services/canvas.model';
     selector: 'app-canvas-list',
   template: `
   <h2>CANVASES</h2>
-  <ul>
-    <li *ngFor="let canvas of canvases">
-        <span>{{canvas.canvasName}} {{canvas.canvasId}}</span><button (click)=remove(canvas)>remove</button>
-    </li>
+    <ul>
+        <li *ngFor="let canvas of canvases">
+            <span>{{canvas.canvasName}} {{canvas.canvasId}}</span><button (click)=remove(canvas)>remove</button>
+        </li>
     </ul>
   `,
 })
 export class CanvasListComponent implements OnInit {
 
-  private canvases: CanvasModel[];
+  public canvases: CanvasModel[];
   public canvas: CanvasModel;
 
   constructor(
