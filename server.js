@@ -22,7 +22,7 @@ const path = require('path');
 // a protocol other than HTTPS,
 // redirect that request to the
 // same url but with HTTPS
-/*const forceSSL = function() {
+const forceSSL = function() {
   return function (req, res, next) {
     if (req.headers['x-forwarded-proto'] !== 'https') {
       return res.redirect(
@@ -35,7 +35,7 @@ const path = require('path');
 // Instruct the app
 // to use the forceSSL
 // middleware
-app.use(forceSSL());*/
+app.use(forceSSL());
 
 // Run the app by serving the static files
 // in the dist directory
@@ -50,12 +50,10 @@ app.use(bodyParser.json());
 app.use('/api/canvas', canvas);
 app.use('/api/adduser', adduser);
 
-//require('./backend/routes')(app);
-
 // Start the app by listening on the default
 // Heroku port
-//app.listen(process.env.PORT || 8080);
-app.listen(4200)
+app.listen(process.env.PORT || 8080);
+//app.listen(4200)
 
 // For all GET requests, send back index.html
 // so that PathLocationStrategy can be used
