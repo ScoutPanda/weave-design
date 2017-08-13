@@ -3,8 +3,8 @@ const router = express.Router();
 
 var User = require('../models/user');
 
-router.post('/', function(req, res){
-    var b64string = req.body;
+router.get('/', function(req, res){
+    var b64string = req.query.data;
     var buf = new Buffer(b64string, 'base64');
     var call = JSON.parse(buf.toString());
     console.log("call" + call);
