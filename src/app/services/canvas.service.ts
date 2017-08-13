@@ -27,7 +27,7 @@ export class CanvasService {
         let transformedCanvases: CanvasModel[] = [];
         for (let canvas of canvases){
           console.log(canvas.canvasData)
-          transformedCanvases.push(new CanvasModel(canvas.canvasName, canvas.canvasData, canvas.id, 'koira'))
+          transformedCanvases.push(new CanvasModel(canvas.canvasName, canvas.canvasData, canvas._id, 'koira'))
         }
         this.canvases = transformedCanvases;
         console.log(transformedCanvases)
