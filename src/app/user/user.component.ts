@@ -9,7 +9,6 @@ import { CanvasListComponent } from './canvas-list.component';
   styleUrls: ['./user.component.css']
 })
 export class UserComponent implements OnInit {
-  userId: String;
   showCanvases: boolean = false;
 
   constructor(
@@ -18,13 +17,6 @@ export class UserComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.userId = params['id'];
-    });
-    if(this.userId === localStorage.getItem("id_token")){
-      this.showCanvases = true;
-    }else{
-      this.router.navigate(['/']);
-    }
+    this.showCanvases = true;
   }
 }

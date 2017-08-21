@@ -12,7 +12,7 @@ import { HomeComponent } from './home/home.component';
 import { DesignComponent } from './design/design.component';
 import { HelpComponent } from './help/help.component';
 import { PatternMakerComponent } from './pattern-maker/pattern-maker.component';
-import { ColorPickerModule } from 'ngx-color-picker';
+import { CanvasDrawingModule } from './shared/canvas-drawing/canvas-drawing.module';
 
 import { MyGlobalsService } from './services/myglobals.service';
 import { CanvasService } from './services/canvas.service';
@@ -20,6 +20,7 @@ import { AuthService } from './services/auth.service';
 import { CallbackComponent } from './callback/callback.component';
 import { UserComponent } from './user/user.component';
 import { CanvasListComponent } from './user/canvas-list.component';
+import { AuthGuard } from './services/auth.guard';
 
 @NgModule({
   imports: [
@@ -27,7 +28,7 @@ import { CanvasListComponent } from './user/canvas-list.component';
     FormsModule,
     AppRoutingModule,
     HttpModule,
-    ColorPickerModule,
+    CanvasDrawingModule
   ],
   declarations: [
     AppComponent,
@@ -44,7 +45,8 @@ import { CanvasListComponent } from './user/canvas-list.component';
   providers: [
     MyGlobalsService,
     AuthService,
-    CanvasService
+    CanvasService,
+    AuthGuard
   ],
   bootstrap: [
     AppComponent,

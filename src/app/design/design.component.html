@@ -1,40 +1,4 @@
 <p>
   design works!
 </p>
-<div class="designContainer" [hidden]="!executeClicked">
-  <div id="container">
-    <button [(colorPicker)]="horColor" [style.background]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, true)">Warp</button>
-    <button [(colorPicker)]="verColor" [style.background]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, false)">Weft</button>
-  </div>
-  <div id="canvasContainerUp">
-      <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="colorBarListener($event, true)">
-      </canvas>
-      <canvas id="swCanvas" width="0" height="0">
-      </canvas>
-      <canvas id="seCanvas" width="0" height="0">
-      </canvas>
-  </div>
-  <div id="canvasContainerDown">
-      <canvas id="nwCanvas" width="0" height="0" (click)="nwCanvasListener($event)">
-      </canvas>
-      <canvas id="neCanvas" width="0" height="0">
-      </canvas>
-      <canvas id="verColorCanvas" width="0" height="0" (click)="colorBarListener($event, false)">
-      </canvas>
-  </div>
-</div>
-<button (click)="save()" *ngIf="loggedIn()">Save!</button>
-<button (click)="execute()">
-  click me
-</button>
-<button (click)="koira()">
-  click me2
-</button>
-<label for="shaft">Shaft</label>
-<input type="number" id="shaft" [(ngModel)]="shaft">
-<label for="heddles">Heddles</label>
-<input type="number" id="heddles" [(ngModel)]="heddles">
-<label for="lines">Lines</label>
-<input type="number" id="lines" [(ngModel)]="lines">
-<label for="size">Size</label>
-<input type="number" id="size" [(ngModel)]="rectSize">
+<canvas-drawing [isDesign]="true"></canvas-drawing>

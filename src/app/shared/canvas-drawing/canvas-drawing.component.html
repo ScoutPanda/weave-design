@@ -1,28 +1,26 @@
-<p>
-  design works!
-</p>
-<div class="designContainer" style="display:block" [hidden]="!executeClicked">
+<div class="designContainer"  [hidden]="!executeClicked">
   <div id="container">
-    <button [(colorPicker)]="horColor" [style.background]="horColor" [cpPresetColors]="testiarray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="testi($event)">Warp</button>
-    <button [(colorPicker)]="verColor" [style.background]="verColor" [cpPresetColors]="testiarray" [cpAlphaChannel]="'disabled'">Weft</button>
+    <button [(colorPicker)]="horColor" [style.background]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, true)">Warp</button>
+    <button [(colorPicker)]="verColor" [style.background]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, false)">Weft</button>
   </div>
   <div id="canvasContainerUp">
       <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="colorBarListener($event, true)">
       </canvas>
-      <canvas id="swCanvas" width="0" height="0">
+      <canvas id="horCanvas" width="0" height="0" canvasDrawing [isDesign]="!isDesign" [eventListener]="horCanvasListener.bind(this)">
       </canvas>
-      <canvas id="seCanvas" width="0" height="0">
+      <canvas id="resultCanvas" width="0" height="0" canvasDrawing [isDesign]="!isDesign" [eventListener]="resultCanvasListener.bind(this)">
       </canvas>
   </div>
   <div id="canvasContainerDown">
-      <canvas id="nwCanvas" width="0" height="0" (click)="nwCanvasListener($event)">
+      <canvas id="mainCanvas" width="0" height="0" canvasDrawing [isDesign]="isDesign" [eventListener]="mainCanvasListener.bind(this)">
       </canvas>
-      <canvas id="neCanvas" width="0" height="0">
+      <canvas id="verCanvas" width="0" height="0" canvasDrawing [isDesign]="!isDesign" [eventListener]="verCanvasListener.bind(this)">
       </canvas>
       <canvas id="verColorCanvas" width="0" height="0" (click)="colorBarListener($event, false)">
       </canvas>
   </div>
 </div>
+<button (click)="save()" *ngIf="loggedIn()">Save!</button>
 <button (click)="execute()">
   click me
 </button>
