@@ -14,6 +14,8 @@ import { CanvasDrawingService } from './canvas-drawing.service'
 
 import { CanvasCtxInterface } from './canvas-ctx.interface';
 
+import { b64ToBlob } from '../../services/b64-to-blob.service'
+
 @Component({
   selector: 'canvas-drawing',
   templateUrl: './canvas-drawing.component.html',
@@ -33,6 +35,7 @@ export class CanvasDrawingComponent implements OnInit {
   private heddlesArray: any[] = [];
   private linesArray: any[] = [];
   private shaftArray: any[] = [];
+  private canvasArray: any;
 
   private horUniqueArray: any[] = [];
   private verUniqueArray: any[] = [];
@@ -61,7 +64,8 @@ export class CanvasDrawingComponent implements OnInit {
     private globals: MyGlobalsService,
     private cpService: ColorPickerService,
     private canvasService: CanvasService,
-    private canvasDrawingService: CanvasDrawingService
+    private canvasDrawingService: CanvasDrawingService,
+    private b64toBlob: b64ToBlob
   ) {}
 
   public initCanvas(){
@@ -72,6 +76,7 @@ export class CanvasDrawingComponent implements OnInit {
       canvas = <HTMLCanvasElement>canvasArray[i];
       this.refreshCtx(canvas.getContext("2d"));
     }
+    this.canvasArray = canvasArray;
   }
 
   refreshCtx (ctx: CanvasRenderingContext2D): CanvasRenderingContext2D{
@@ -402,6 +407,43 @@ export class CanvasDrawingComponent implements OnInit {
     }
   }
 
+  public saveToPng(){
+    let canvases = this.canvasArray
+    let tempCanvas = <HTMLCanvasElement>document.getElementById("pngcanvas");
+    let ctx = tempCanvas.getContext("2d");
+    let size = this.rectSize;
+    let padding = 5;
+    let heddles = this.heddles;
+    let shaft = this.shaft;
+
+    let lines = this.lines
+    let absolutewidth = size * heddles + padding * 2 + size * shaft + size;
+    let absoluteheight = size * lines + padding * 2 + size * shaft + size;
+    ctx.canvas.width = absolutewidth;
+    ctx.canvas.height = absoluteheight;
+    //ctx.fillStyle = "#fff";
+    //ctx.fillRect(0,0, absolutewidth, absoluteheight)
+    //let len = canvases.length - 1;
+    //ctx.drawImage(canvases[len],0,0)
+    
+    // Yes, I know it is horrible
+    // Slightly less horrible way would be to create a tempcanvas instead of getting one
+    // But for some reason my created htmlcanvaselements did not have getContext method...
+    
+    ctx.drawImage(canvases[0],0,0)
+    ctx.drawImage(canvases[1],0, size + padding)
+    ctx.drawImage(canvases[2], heddles * size + padding, size + padding)
+    ctx.drawImage(canvases[3],0, size * shaft + size + padding * 2)
+    ctx.drawImage(canvases[4], heddles * size + padding, size * shaft + size + padding * 2)
+    ctx.drawImage(canvases[5], heddles * size + padding * 2 + size * shaft, size * shaft + size + padding * 2)
+    var base64 = tempCanvas.toDataURL();
+    let blob = this.b64toBlob.ToBlob(base64);
+
+
+    let link = <HTMLLinkElement>document.getElementById('btn-download')
+    link.href = URL.createObjectURL(blob);
+  }
+
   public execute(){
     this.draw();
     this.executeClicked = true
@@ -410,5 +452,4 @@ export class CanvasDrawingComponent implements OnInit {
   ngOnInit() {
     this.initCanvas();
   }
-
 }

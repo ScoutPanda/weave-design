@@ -7,6 +7,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { CanvasDrawingService } from './canvas-drawing.service';
 import { CanvasDrawingComponent } from './canvas-drawing.component';
 import { CanvasDrawingDirective } from './canvas-drawing.directive';
+import { b64ToBlob } from '../../services/b64-to-blob.service';
 
 @NgModule({
   imports: [ 
@@ -14,7 +15,7 @@ import { CanvasDrawingDirective } from './canvas-drawing.directive';
     FormsModule,
     ColorPickerModule,
     ],
-  providers: [ CanvasDrawingService ],
+  providers: [ CanvasDrawingService, b64ToBlob ],
   declarations: [ CanvasDrawingComponent, CanvasDrawingDirective ],
   exports: [ CanvasDrawingComponent, CanvasDrawingDirective ],
   //entryComponents: [ CanvasDrawingComponent ]
