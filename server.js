@@ -11,10 +11,10 @@ const mongoose = require('mongoose')
 const app = express();
 
 // config files
-//var db = require('./backend/config/db');
+var db = require('./backend/config/db');
 
 //mongoose.connect('localhost:27017/testi');
-mongoose.connect('mongodb://heroku_pj7cvwvb:sp26kfoad9kkh3mmvjpt9gtag@ds123080.mlab.com:23080/heroku_pj7cvwvb');
+mongoose.connect(db.url);
 
 const path = require('path');
 

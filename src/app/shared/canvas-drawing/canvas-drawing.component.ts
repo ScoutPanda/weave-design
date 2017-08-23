@@ -34,6 +34,9 @@ export class CanvasDrawingComponent implements OnInit {
   private linesArray: any[] = [];
   private shaftArray: any[] = [];
 
+  private horUniqueArray: any[] = [];
+  private verUniqueArray: any[] = [];
+
   private ctxObject = {} as CanvasCtxInterface;
 
   public heddles: number = 10;
@@ -81,10 +84,12 @@ export class CanvasDrawingComponent implements OnInit {
   public draw(){
     this.verColorArray = this.canvasDrawingService.prepareColorArray(this.verColorArray, this.lines, this.verColor);
     this.horColorArray = this.canvasDrawingService.prepareColorArray(this.horColorArray, this.heddles, this.horColor);
-    this.mainCanvasArray = this.canvasDrawingService.prepareArray(this.mainCanvasArray, this.lines, this.heddles);
-    this.resultCanvasArray = this.canvasDrawingService.prepareArray(this.resultCanvasArray, this.shaft, this.shaft);
-    this.horCanvasArray = this.canvasDrawingService.prepareArray(this.horCanvasArray, this.shaft, this.heddles);
-    this.verCanvasArray = this.canvasDrawingService.prepareArray(this.verCanvasArray, this.lines, this.shaft);
+    this.mainCanvasArray = this.canvasDrawingService.prepare2DArray(this.mainCanvasArray, this.lines, this.heddles);
+    this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, this.shaft, this.shaft);
+    this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, this.shaft, this.heddles);
+    this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.lines, this.shaft);
+    this.verUniqueArray = this.canvasDrawingService.prepareArray(this.verUniqueArray, this.lines);
+    this.horUniqueArray = this.canvasDrawingService.prepareArray(this.horUniqueArray, this.heddles);
 
     let ctxObject = this.ctxObject;
 
@@ -176,16 +181,24 @@ export class CanvasDrawingComponent implements OnInit {
       ctx.fillRect(x,y, this.rectSize, this.rectSize);
       ctx.strokeRect(x,y, this.rectSize, this.rectSize)
       this.mainCanvasArray[indexY][indexX] = 0;
+      this.horUniqueArray[indexX] -= (indexY+1) ** 2;
+      this.verUniqueArray[indexY] -= (indexX+1) ** 2;
     }
     else{
       ctx.fillStyle = this.horColorArray[indexX].color;
       ctx.fillRect(x, y, this.rectSize, this.rectSize);
       ctx.strokeRect(x,y, this.rectSize, this.rectSize)
       this.mainCanvasArray[indexY][indexX] = 1;
+      this.horUniqueArray[indexX] += (indexY+1) ** 2;
+      this.verUniqueArray[indexY] += (indexX+1) ** 2;
     }
   }
 
-    public resultCanvasListener(evt){
+  private checkDrawMain(indexX: number, indexY: number){
+
+  }
+
+  public resultCanvasListener(evt){
     let ctx = this.ctxObject[evt.srcElement.id];
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
@@ -349,7 +362,7 @@ export class CanvasDrawingComponent implements OnInit {
     this.updateColors(indexX,indexY, isHor)
   }
 
-  public updateColors(indexX: number, indexY:number, isHor: boolean){
+  private updateColors(indexX: number, indexY:number, isHor: boolean){
     let ctx = this.ctxObject["mainCanvas"];
     let size = this.rectSize;
     let height = this.lines;
@@ -377,7 +390,7 @@ export class CanvasDrawingComponent implements OnInit {
     }
   }
 
-  public drawRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, x: number = 0, y: number = 0){
+  private drawRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, x: number = 0, y: number = 0){
     this.refreshCtx(targetCtx)
     let size: number = this.rectSize;
     for (let a = 0; a < height; a++) {
