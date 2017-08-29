@@ -1,7 +1,7 @@
 <div class="designContainer"  [hidden]="!executeClicked">
   <div id="container">
-    <button [(colorPicker)]="horColor" [style.background]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, true)">Warp</button>
-    <button [(colorPicker)]="verColor" [style.background]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, false)">Weft</button>
+    <button type="button" class="btn btn-outline-primary" [(colorPicker)]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, true)"><i class="material-icons" [style.color]="horColor">color_lens</i>Warp</button>
+    <button type="button" class="btn btn-outline-primary" [(colorPicker)]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, false)"><i class="material-icons" [style.color]="verColor">color_lens</i>Weft</button>
   </div>
   <div id="canvasContainerUp">
       <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="colorBarListener($event, true)">
@@ -24,6 +24,9 @@
 <button (click)="execute()">
   click me
 </button>
+<button (click)="koira()">
+  koira
+</button>
 <label for="shaft">Shaft</label>
 <input type="number" id="shaft" [(ngModel)]="shaft">
 <label for="heddles">Heddles</label>
@@ -32,5 +35,5 @@
 <input type="number" id="lines" [(ngModel)]="lines">
 <label for="size">Size</label>
 <input type="number" id="size" [(ngModel)]="rectSize">
-<a class="button" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download</a>
+<a href="#" class="button" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download</a>
 <canvas id="pngcanvas" width="0" height="0" hidden></canvas>

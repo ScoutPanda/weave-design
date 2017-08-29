@@ -197,10 +197,82 @@ export class CanvasDrawingComponent implements OnInit {
       this.horUniqueArray[indexX] += (indexY+1) ** 2;
       this.verUniqueArray[indexY] += (indexX+1) ** 2;
     }
+    //this.checkDrawMain(indexX, indexY)
   }
 
   private checkDrawMain(indexX: number, indexY: number){
+    let verCtx = this.ctxObject["verCanvas"];
+    let horCtx = this.ctxObject["horCanvas"];
+    let resultCtx = this.ctxObject["resultCanvas"];
+    let size = this.rectSize;
+    verCtx.fillStyle = this.defaultGray
+    horCtx.fillStyle = this.defaultGray
+    resultCtx.fillStyle = this.defaultGray
 
+    verCtx.fillRect(0, indexY*10, size, size);
+    verCtx.strokeRect(0, indexY*10, size, size);
+    this.verCanvasArray[indexY][0] = 1;
+    horCtx.fillRect(indexX*10, 0, size, size);
+    horCtx.strokeRect(indexX*10, 0, size, size);
+    this.horCanvasArray[0][indexX] = 1;
+
+    resultCtx.fillRect(0,0,size,size)
+    resultCtx.strokeRect(0,0,size,size)
+    this.resultCanvasArray[0][0] = 1;
+  }
+
+  private koira(){
+    let verTaulu = Array(this.lines);
+    let horTaulu = Array(this.heddles);
+
+    let temp = this.canvasDrawingService.makeDesignArray(horTaulu, this.horUniqueArray);
+    horTaulu = temp.array;
+    let horMax = temp.count;
+    temp = this.canvasDrawingService.makeDesignArray(verTaulu, this.verUniqueArray);
+    verTaulu = temp.array;
+    let verMax = temp.count;
+
+    this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.lines, verMax);
+    this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, horMax, this.heddles);
+
+    for(let i = 0; i < this.lines; i++){
+      if(verTaulu[i] <= verMax && verTaulu[i] > 0){
+        this.verCanvasArray[i][verTaulu[i]-1  ] = 1;
+      }
+    }
+    for(let i = 0; i < this.heddles; i++){
+      if(horTaulu[i] > 0){
+        this.horCanvasArray[horTaulu[i]-1][i] = 1;
+      }
+    }
+
+    this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, horMax, verMax);
+    for (let i = 0; i < this.lines; i++) {
+      for (let j = 0; j < this.heddles; j++) {
+        if (this.mainCanvasArray[i][j] == 1) {
+          this.resultCanvasArray[horTaulu[j]-1][verTaulu[i]-1] = 1;
+        }
+      }
+    }
+
+    let ctxObject = this.ctxObject;
+    let ctx = ctxObject.verCanvas;
+
+    ctx.canvas.width = verMax * this.rectSize;
+    ctx.canvas.height = this.lines * this.rectSize;
+    this.drawRects(verMax, this.lines, this.defaultWhite, ctx, 0, 0, this.verCanvasArray)
+
+    ctx = ctxObject.horCanvas;
+
+    ctx.canvas.width = this.heddles * this.rectSize;
+    ctx.canvas.height = horMax * this.rectSize;
+    this.drawRects(this.heddles, horMax, this.defaultWhite, ctx, 0, 0, this.horCanvasArray)
+
+    ctx = ctxObject.resultCanvas;
+
+    ctx.canvas.height = horMax * this.rectSize;
+    ctx.canvas.width = verMax * this.rectSize;
+    this.drawRects(verMax, horMax, this.defaultWhite, ctx, 0, 0, this.resultCanvasArray)
   }
 
   public resultCanvasListener(evt){
@@ -215,7 +287,8 @@ export class CanvasDrawingComponent implements OnInit {
       ctx.strokeRect(x,y, this.rectSize, this.rectSize)
       this.resultCanvasArray[indexY][indexX] = 0;
     }
-    else{
+    else
+    {
       ctx.fillStyle = this.defaultGray;
       ctx.fillRect(x, y, this.rectSize, this.rectSize);
       ctx.strokeRect(x,y, this.rectSize, this.rectSize)
@@ -395,14 +468,52 @@ export class CanvasDrawingComponent implements OnInit {
     }
   }
 
-  private drawRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, x: number = 0, y: number = 0){
+  private updateRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, array: any[], x: number = 0, y: number = 0/*array: any[], targetCtx, isVer: boolean = false*/){
     this.refreshCtx(targetCtx)
     let size: number = this.rectSize;
     for (let a = 0; a < height; a++) {
       for (let b = 0; b < width; b++) {
-        targetCtx.fillStyle = rectColor;
-        targetCtx.fillRect(b * size + x, a * size + y, size, size);
-        targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        //if(array[i][j] === 1){
+          
+          targetCtx.fillStyle = rectColor;
+          targetCtx.fillRect(b * size + x, a * size + y, size, size);
+          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        //}
+      }
+    }
+    /*let leni = 0;
+    let lenj = 0;
+    if(isVer){
+      let leni = array[0].length;
+      let lenj = array.length;
+    }else{
+      let leni = array.length;
+      let lenj = array[0].length;
+    }
+    for(let i = 0; i < leni; i++){
+      for(let j = 0; j < lenj; j++){
+        if(array[i][j] === 1){
+          ctx.fillRect()
+        }
+      }
+    }*/
+  }
+
+  private drawRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, x: number = 0, y: number = 0, array: any[] = null){
+    this.refreshCtx(targetCtx)
+    let size: number = this.rectSize;
+    for (let a = 0; a < height; a++) {
+      for (let b = 0; b < width; b++) {
+        if(array === null || array[a][b] === 0){
+          targetCtx.fillStyle = rectColor;
+          targetCtx.fillRect(b * size + x, a * size + y, size, size);
+          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        }
+        if(array !== null && array[a][b] === 1){
+          targetCtx.fillStyle = this.defaultGray;
+          targetCtx.fillRect(b * size + x, a * size + y, size, size);
+          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        }
       }
     }
   }
@@ -442,6 +553,9 @@ export class CanvasDrawingComponent implements OnInit {
 
     let link = <HTMLLinkElement>document.getElementById('btn-download')
     link.href = URL.createObjectURL(blob);
+  
+    ctx.canvas.width = 0;
+    ctx.canvas.height = 0;
   }
 
   public execute(){

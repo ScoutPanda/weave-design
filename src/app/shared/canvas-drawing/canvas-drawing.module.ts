@@ -13,7 +13,7 @@ import { b64ToBlob } from '../../services/b64-to-blob.service';
   imports: [ 
     CommonModule,
     FormsModule,
-    ColorPickerModule,
+    ColorPickerModule
     ],
   providers: [ CanvasDrawingService, b64ToBlob ],
   declarations: [ CanvasDrawingComponent, CanvasDrawingDirective ],
