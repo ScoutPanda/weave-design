@@ -221,7 +221,7 @@ export class CanvasDrawingComponent implements OnInit {
     this.resultCanvasArray[0][0] = 1;
   }
 
-  private koira(){
+  public koira(){
     let verTaulu = Array(this.lines);
     let horTaulu = Array(this.heddles);
 
@@ -466,37 +466,6 @@ export class CanvasDrawingComponent implements OnInit {
         }
       }
     }
-  }
-
-  private updateRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, array: any[], x: number = 0, y: number = 0/*array: any[], targetCtx, isVer: boolean = false*/){
-    this.refreshCtx(targetCtx)
-    let size: number = this.rectSize;
-    for (let a = 0; a < height; a++) {
-      for (let b = 0; b < width; b++) {
-        //if(array[i][j] === 1){
-          
-          targetCtx.fillStyle = rectColor;
-          targetCtx.fillRect(b * size + x, a * size + y, size, size);
-          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
-        //}
-      }
-    }
-    /*let leni = 0;
-    let lenj = 0;
-    if(isVer){
-      let leni = array[0].length;
-      let lenj = array.length;
-    }else{
-      let leni = array.length;
-      let lenj = array[0].length;
-    }
-    for(let i = 0; i < leni; i++){
-      for(let j = 0; j < lenj; j++){
-        if(array[i][j] === 1){
-          ctx.fillRect()
-        }
-      }
-    }*/
   }
 
   private drawRects(width: number, height: number, rectColor: string, targetCtx: CanvasRenderingContext2D, x: number = 0, y: number = 0, array: any[] = null){
