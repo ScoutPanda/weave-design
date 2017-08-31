@@ -24,8 +24,20 @@
 <button (click)="execute()">
   click me
 </button>
-<button (click)="koira()">
-  koira
+<button (click)="makeDesign()">
+  make design
+</button>
+<button (click)="changeSize()">
+  change size
+</button>
+<button (click)="changeSize(true)">
+  update shaft
+</button>
+<button (click)="fillColorRow(true)">
+  fill warp color
+</button>
+<button (click)="fillColorRow(false)">
+  fill weft color
 </button>
 <label for="shaft">Shaft</label>
 <input type="number" id="shaft" [(ngModel)]="shaft">
@@ -36,4 +48,3 @@
 <label for="size">Size</label>
 <input type="number" id="size" [(ngModel)]="rectSize">
 <a href="#" class="button" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download</a>
-<canvas id="pngcanvas" width="0" height="0" hidden></canvas>

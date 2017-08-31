@@ -32,27 +32,28 @@ export class CanvasDrawingService {
     return colorArray;
   }
 
-  public makeDesignArray(array: any[], uniqueArray: any[]): any{
-    return uniqueArray.reduce(function(values, v) {
+  public makeDesignArray(uniqueArray: any[]): any{
+    let array = Array(uniqueArray.length);
+    return uniqueArray.reduce(function(values, v, i) {
       if(v !== 0){
         if(values.set[v]){
           let len = Object.keys(values.set).length
           for(let j = 0; j <= len; j++){
             if(values.set[v] === j){
-              values.array[values.i] = values.set[v]
+              values.array[i] = values.set[v]
             }
           }
         }
         else if (!values.set[v]) {
           values.count++;
-          values.array[values.i] = values.count;
+          values.array[i] = values.count;
           values.set[v] = values.count;
         }
       }else{
-        values.array[values.i] = 0;
+        values.array[i] = 0;
       }
       values.i++
       return values;
-    }, { set: {}, count: 0, i: 0, array});
+    }, { set: {}, count: 0, array});
   }
 }
