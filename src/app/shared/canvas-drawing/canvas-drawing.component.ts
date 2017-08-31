@@ -536,7 +536,7 @@ export class CanvasDrawingComponent implements OnInit {
     this.updateColors(indexX,indexY, isHor)
   }
 
-  private fillColorRow(isHor: boolean){
+  public fillColorRow(isHor: boolean){
     if(isHor){
       let ctx = this.ctxObject["horColorCanvas"];
       ctx.fillStyle = this.horColor;
