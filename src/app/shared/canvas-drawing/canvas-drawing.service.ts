@@ -25,9 +25,7 @@ export class CanvasDrawingService {
 
   public prepareColorArray(colorArray: any[], length: number, color: string): string[]{
     for (let i = 0; i < length; i++){
-      colorArray[i] = {
-        color: color
-      };
+      colorArray[i] = color;
     }
     return colorArray;
   }

@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, Renderer2 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { Router } from '@angular/router';
@@ -21,6 +21,8 @@ import { CallbackComponent } from './callback/callback.component';
 import { UserComponent } from './user/user.component';
 import { CanvasListComponent } from './user/canvas-list.component';
 import { AuthGuard } from './services/auth.guard';
+import { B64ToBlobService } from './services/b64-to-blob.service';
+import { SharedDataService } from './services/shareddata.service';
 
 @NgModule({
   imports: [
@@ -46,7 +48,9 @@ import { AuthGuard } from './services/auth.guard';
     MyGlobalsService,
     AuthService,
     CanvasService,
-    AuthGuard
+    AuthGuard,
+    B64ToBlobService,
+    SharedDataService
   ],
   bootstrap: [
     AppComponent,

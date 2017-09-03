@@ -1,21 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AppRoutingModule } from '../../app-routing.module';
 
 import { ColorPickerModule } from 'ngx-color-picker';
 
 import { CanvasDrawingService } from './canvas-drawing.service';
 import { CanvasDrawingComponent } from './canvas-drawing.component';
 import { CanvasDrawingDirective } from './canvas-drawing.directive';
-import { b64ToBlob } from '../../services/b64-to-blob.service';
+import { SaveToPngService } from '../../services/savetopng.service';
 
 @NgModule({
   imports: [ 
     CommonModule,
     FormsModule,
-    ColorPickerModule
+    ColorPickerModule,
+    AppRoutingModule
     ],
-  providers: [ CanvasDrawingService, b64ToBlob ],
+  providers: [ CanvasDrawingService, SaveToPngService ],
   declarations: [ CanvasDrawingComponent, CanvasDrawingDirective ],
   exports: [ CanvasDrawingComponent, CanvasDrawingDirective ],
   //entryComponents: [ CanvasDrawingComponent ]

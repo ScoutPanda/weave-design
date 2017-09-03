@@ -1,10 +1,10 @@
 <div class="designContainer"  [hidden]="!executeClicked">
   <div id="container">
-    <button type="button" class="btn btn-outline-primary" [(colorPicker)]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, true)"><i class="material-icons" [style.color]="horColor">color_lens</i>Warp</button>
-    <button type="button" class="btn btn-outline-primary" [(colorPicker)]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetter($event, false)"><i class="material-icons" [style.color]="verColor">color_lens</i>Weft</button>
+    <button type="button" class="btn btn-outline-primary" [(colorPicker)]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetterHor($event)"><i class="material-icons" [style.color]="horColor">color_lens</i>Warp</button>
+    <button type="button" class="btn btn-outline-primary" [(colorPicker)]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetterVer($event)"><i class="material-icons" [style.color]="verColor">color_lens</i>Weft</button>
   </div>
   <div id="canvasContainerUp">
-      <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="colorBarListener($event, true)">
+      <canvas style="display:block; margin-bottom:5px;" id="horColorCanvas" width="0" height="0" (click)="horColorBarListener($event)">
       </canvas>
       <canvas id="horCanvas" width="0" height="0" canvasDrawing [isDesign]="!isDesign" [eventListener]="horCanvasListener.bind(this)">
       </canvas>
@@ -16,7 +16,7 @@
       </canvas>
       <canvas id="verCanvas" width="0" height="0" canvasDrawing [isDesign]="!isDesign" [eventListener]="verCanvasListener.bind(this)">
       </canvas>
-      <canvas id="verColorCanvas" width="0" height="0" (click)="colorBarListener($event, false)">
+      <canvas id="verColorCanvas" width="0" height="0" (click)="verColorBarListener($event)">
       </canvas>
   </div>
 </div>
@@ -24,23 +24,66 @@
 <button (click)="execute()">
   click me
 </button>
-<button (click)="makeDesign()">
+<button *ngIf="isDesign" (click)="makeDesign()">
   make design
 </button>
-<button (click)="changeSize()">
+<button (click)="drawCanvases()">
   change size
 </button>
-<button (click)="changeSize(true)">
+<button *ngIf="!isDesign" (click)="updateShaft()">
   update shaft
 </button>
-<button (click)="fillColorRow(true)">
+<button (click)="fillHorColorRow()">
   fill warp color
 </button>
-<button (click)="fillColorRow(false)">
+<button (click)="fillVerColorRow()">
   fill weft color
 </button>
-<label for="shaft">Shaft</label>
-<input type="number" id="shaft" [(ngModel)]="shaft">
+<button (click)="showReverse()">
+  show reverse
+</button>
+<div *ngIf="isAdditionMode">
+  <button id="add" (click)="isAdditionMode = !isAdditionMode">
+    change to deletion mode
+  </button>
+  <button id="up" (click)="addRowsToMainCanvas($event)">
+    add up
+  </button>
+  <button id="down" (click)="addRowsToMainCanvas($event)">
+    add down
+  </button>
+  <button id="left" (click)="addRowsToMainCanvas($event)">
+    add left
+  </button>
+  <button id="right" (click)="addRowsToMainCanvas($event)">
+    add right
+  </button>
+</div>
+<div *ngIf="!isAdditionMode">
+  <button id="subtract" (click)="isAdditionMode = !isAdditionMode">
+    change to addition mode
+  </button>
+  <button id="up" (click)="deleteRowsFromMainCanvas($event)">
+    delete up
+  </button>
+  <button id="down" (click)="deleteRowsFromMainCanvas($event)">
+    delete down
+  </button>
+  <button id="left" (click)="deleteRowsFromMainCanvas($event)">
+    delete left
+  </button>
+  <button id="right" (click)="deleteRowsFromMainCanvas($event)">
+    delete right
+  </button>
+</div>
+<a *ngIf="!isDesign" (click)="shareData()" [routerLink]=" ['/design']" routerLinkActive="active">
+  Weave design
+</a>
+<a *ngIf="isDesign" (click)="shareData()" [routerLink]=" ['/maker']" routerLinkActive="active">
+  Pattern maker
+</a>
+<label *ngIf="!isDesign" for="shaft">Shaft</label>
+<input *ngIf="!isDesign" type="number" id="shaft" [(ngModel)]="shaft">
 <label for="heddles">Heddles</label>
 <input type="number" id="heddles" [(ngModel)]="heddles">
 <label for="lines">Lines</label>

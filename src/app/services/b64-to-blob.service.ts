@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 @Injectable()
-export class b64ToBlob {
+export class B64ToBlobService {
   constructor() { }
 
   public ToBlob(b64Data, sliceSize = 512) {

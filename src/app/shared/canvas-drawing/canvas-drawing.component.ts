@@ -1,7 +1,4 @@
 import { Component, OnInit, Input, Renderer2 } from '@angular/core';
-import { ColorPickerService, Rgba } from 'ngx-color-picker';
-
-import { MyGlobalsService } from '../../services/myglobals.service';
 
 import { AuthService } from '../../services/auth.service';
 
@@ -14,7 +11,9 @@ import { CanvasDrawingService } from './canvas-drawing.service'
 
 import { CanvasCtxInterface } from './canvas-ctx.interface';
 
-import { b64ToBlob } from '../../services/b64-to-blob.service'
+import { SaveToPngService } from '../../services/savetopng.service';
+
+import { SharedDataService } from '../../services/shareddata.service';
 
 @Component({
   selector: 'canvas-drawing',
@@ -24,7 +23,6 @@ import { b64ToBlob } from '../../services/b64-to-blob.service'
 
 export class CanvasDrawingComponent implements OnInit {
   @Input() isDesign: boolean = true;
-  private rectArr: any[] = [];
 
   private mainCanvasArray: any[] = [];
   private resultCanvasArray: any[] = [];
@@ -32,17 +30,14 @@ export class CanvasDrawingComponent implements OnInit {
   private horCanvasArray: any[] = [];
   private horColorArray: any[] = [];
   private verColorArray: any[] = [];
-  private heddlesArray: any[] = [];
-  private linesArray: any[] = [];
-  private shaftArray: any[] = [];
-  private canvasArray: any;
+  private canvasArray;
   private horMax: number = 2;
   private verMax: number = 2;
-
-  private horUniqueArray: any[] = [];
-  private verUniqueArray: any[] = [];
+  private padding: number = 5;
 
   private ctxObject = {} as CanvasCtxInterface;
+
+  private hadInitialData: boolean = false;
 
   public heddles: number = 10;
   public lines: number = 10;
@@ -54,22 +49,42 @@ export class CanvasDrawingComponent implements OnInit {
 
   public executeClicked: boolean = false;
 
-  //weft = verColor
-  //warp = horColor
   public verColor: string = "#fff500";
   public horColor: string = "#F8F8FF";
+  public defaultVerColor: string = "#fff500";
+  public defaultHorColor: string = "#F8F8FF";
   public defaultWhite: string = "#F8F8FF";
   public defaultGray: string = "#9E9E9E";
+  public defaultRectStrokeColor: string = "#616161";
+  public defaultLineWidth: number = 2;
+  public isAdditionMode: boolean = true;
 
   constructor(
     private auth: AuthService,
-    private globals: MyGlobalsService,
-    private cpService: ColorPickerService,
     private canvasService: CanvasService,
     private canvasDrawingService: CanvasDrawingService,
-    private b64toBlob: b64ToBlob,
-    private renderer2: Renderer2
-  ) {}
+    private saveToPngService: SaveToPngService,
+    private renderer2: Renderer2,
+    private shareddata: SharedDataService
+  ) {
+    if(this.shareddata.hasInitialData){
+      this.shaft = this.shareddata.shaft;
+      this.lines = this.shareddata.lines;
+      this.heddles = this.shareddata.heddles;
+      this.horMax = this.shareddata.horMax;
+      this.verMax = this.shareddata.verMax;
+      this.mainCanvasArray = this.shareddata.mainCanvasArray;
+      this.verCanvasArray = this.shareddata.verCanvasArray;
+      this.horCanvasArray = this.shareddata.horCanvasArray;
+      this.resultCanvasArray = this.shareddata.resultCanvasArray;
+      this.verColorArray = this.shareddata.verColorArray;
+      this.horColorArray = this.shareddata.horColorArray;
+      this.horCPArray = this.shareddata.horCPArray;
+      this.verCPArray = this.shareddata.verCPArray;
+      this.shareddata.hasInitialData = false;
+      this.hadInitialData = true;
+    }
+  }
 
   public initCanvas(){
     let canvasArray = document.getElementsByTagName('canvas');
@@ -82,173 +97,173 @@ export class CanvasDrawingComponent implements OnInit {
     this.canvasArray = canvasArray;
   }
 
-  refreshCtx (ctx: CanvasRenderingContext2D): CanvasRenderingContext2D{
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#616161';
+  private refreshCtx (ctx: CanvasRenderingContext2D): CanvasRenderingContext2D{
+    ctx.lineWidth = this.defaultLineWidth;
+    ctx.strokeStyle = this.defaultRectStrokeColor;
     this.ctxObject[ctx.canvas.id] = ctx;
     return ctx;
   }
 
   public draw(){
-    this.verColor = "#fff500";
-    this.horColor = "#F8F8FF";
-    this.verColorArray = this.canvasDrawingService.prepareColorArray(this.verColorArray, this.lines, this.verColor);
-    this.horColorArray = this.canvasDrawingService.prepareColorArray(this.horColorArray, this.heddles, this.horColor);
-    this.mainCanvasArray = this.canvasDrawingService.prepare2DArray(this.mainCanvasArray, this.lines, this.heddles);
-    this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, this.shaft, this.shaft);
-    this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, this.shaft, this.heddles);
-    this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.lines, this.shaft);
-    this.verUniqueArray = this.canvasDrawingService.prepareArray(this.verUniqueArray, this.lines);
-    this.horUniqueArray = this.canvasDrawingService.prepareArray(this.horUniqueArray, this.heddles);
+    if(!this.hadInitialData){
+      this.horColor = this.defaultHorColor;
+      this.verColor = this.defaultVerColor;
+      this.verColorArray = this.canvasDrawingService.prepareColorArray(this.verColorArray, this.lines, this.verColor);
+      this.horColorArray = this.canvasDrawingService.prepareColorArray(this.horColorArray, this.heddles, this.horColor);
+      this.mainCanvasArray = this.canvasDrawingService.prepare2DArray(this.mainCanvasArray, this.lines, this.heddles);
+      this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, this.shaft, this.shaft);
+      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, this.shaft, this.heddles);
+      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.lines, this.shaft);
+      this.hadInitialData = false;
+    }
+    this.drawCanvases();
 
-    let ctxObject = this.ctxObject;
+    this.updateHorMaxAndVerMax();
+  }
 
-    let ctx = this.ctxObject.mainCanvas
-    ctx.canvas.width = this.heddles * this.rectSize;
-    ctx.canvas.height = this.lines * this.rectSize;
-    this.drawRects(this.heddles, this.lines, ctx, this.verColor);
+  public updateShaft(){
+    if(this.shaft > this.verCanvasArray[0].length){
+      this.addVerRowsToVerCanvasArray();
+    }
+    else if (this.shaft < this.verCanvasArray[0].length)
+    {
+      this.removeVerRowsFromCanvasArrays();
+    }
+    if(this.shaft > this.horCanvasArray.length)
+    {
+      this.addHorRowsToCanvasArrays();
+    }
+    else if (this.shaft < this.horCanvasArray.length)
+    {
+      this.removeHorRowsFromCanvasArrays();
+    }
 
-    ctx = ctxObject.verCanvas;
+    this.updateHorMaxAndVerMax();
+    this.drawHorCanvas();
+    this.drawVerCanvas();
+    this.drawResultCanvas();
+  }
 
-    ctx.canvas.width = this.shaft * this.rectSize;
-    ctx.canvas.height = this.lines * this.rectSize;
-    this.drawRects(this.shaft, this.lines, ctx)
+  private addVerRowsToVerCanvasArray(){
+    let len = this.shaft - this.verCanvasArray[0].length;
+    for(let i = 0; i < len; i++){
+      for(let j = 0; j < this.lines; j++){
+        this.verCanvasArray[j].push(0);
+      }
+    }
+  }
 
-    ctx = ctxObject.horCanvas;
+  private removeVerRowsFromCanvasArrays(){
+    let len = this.verCanvasArray[0].length - this.shaft;
+    this.removeVerRowFromResultCanvasArray(len);
+    this.removeVerRowFromVerCanvasArray(len);
+  }
 
-    ctx.canvas.width = this.heddles * this.rectSize;
-    ctx.canvas.height = this.shaft * this.rectSize;
-    this.drawRects(this.heddles, this.shaft, ctx)
+  private removeVerRowFromVerCanvasArray(len: number){
+    for(let j = 0; j < this.lines; j++){
+      this.verCanvasArray[j].splice(this.shaft, len);
+    }
+  }
 
-    ctx = ctxObject.resultCanvas;
+  private removeVerRowFromResultCanvasArray(len: number){
+    for(let i = 0; i < this.verCanvasArray[0].length; i++){
+      this.resultCanvasArray[i].splice(this.shaft,len)
+    }
+  }
 
-    ctx.canvas.height = this.shaft * this.rectSize;
-    ctx.canvas.width = this.shaft * this.rectSize;
-    this.drawRects(this.shaft, this.shaft, ctx)
+  private addHorRowsToCanvasArrays(){
+    let len = this.shaft - this.horCanvasArray.length;
+    for(let i = this.horCanvasArray.length-1; i >= 0; i--){
+      for(let j = 0; j < len; j++){
+        this.resultCanvasArray[i].push(0);
+      }
+    }
+    for(let i = 0; i < len; i++){
+      this.horCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.heddles), this.heddles));
+      this.resultCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.horCanvasArray.length),  this.horCanvasArray.length));
+    }
+  }
 
-    ctx = ctxObject.verColorCanvas;
+  private removeHorRowsFromCanvasArrays(){
+    let len = this.horCanvasArray.length - this.shaft;
+    this.horCanvasArray.splice(0, len);
+    this.resultCanvasArray.splice(0,len);
+  }
 
-    ctx.canvas.height = this.lines * this.rectSize;
-    ctx.canvas.width = this.rectSize;
-    this.drawRects(1, this.lines, ctx, this.verColor)
+  public drawCanvases(){
+    this.drawMainCanvas();
+    this.drawHorCanvas();
+    this.drawVerCanvas();
+    this.drawResultCanvas();
+    this.drawHorColorCanvas();
+    this.drawVerColorCanvas();
+  }
 
-    ctx = ctxObject.horColorCanvas;
-
-    ctx.canvas.height = this.rectSize;
-    ctx.canvas.width = this.heddles * this.rectSize;
-    this.drawRects(this.heddles, 1, ctx, this.horColor);
-
+  private updateHorMaxAndVerMax(){
     this.horMax = this.shaft;
     this.verMax = this.shaft;
   }
 
-  public changeSize(updateShaft: boolean = false){
-    if(updateShaft){
-      if(this.shaft > this.verCanvasArray[0].length){
-        let len = this.shaft - this.verCanvasArray[0].length;
-        for(let i = 0; i < len; i++){
-          for(let j = 0; j < this.lines; j++){
-            this.verCanvasArray[j].push(0);
-          }
-        }
-      }
-      else if (this.shaft < this.verCanvasArray[0].length)
-      {
-        let len = this.verCanvasArray[0].length - this.shaft;
-        for(let i = 0; i < this.verCanvasArray[0].length; i++){
-          this.resultCanvasArray[i].splice(this.shaft,len)
-        }
-        for(let j = 0; j < this.lines; j++){
-          this.verCanvasArray[j].splice(this.shaft, len);
-        }
-      }
-      if(this.shaft > this.horCanvasArray.length)
-      {
-        let len = this.shaft - this.horCanvasArray.length;
-        for(let i = this.horCanvasArray.length-1; i >= 0; i--){
-          for(let j = 0; j < len; j++){
-            this.resultCanvasArray[i].push(0);
-          }
-        }
-        for(let i = 0; i < len; i++){
-            this.horCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.heddles), this.heddles));
-        }
-        for(let i = 0; i < len; i++){
-          this.resultCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.horCanvasArray.length), this.horCanvasArray.length));
-        }
-      }
-      else if (this.shaft < this.horCanvasArray.length)
-      {
-        let len = this.horCanvasArray.length - this.shaft;
-        this.horCanvasArray.splice(0, len);
-        this.resultCanvasArray.splice(0,len);
-      }
-    }
-    if(!this.isDesign){
-      this.horMax = this.shaft;
-      this.verMax = this.shaft;
-    }
-    let ctxObject = this.ctxObject;
-
-    let ctx = this.ctxObject.mainCanvas
-    ctx.canvas.width = this.heddles * this.rectSize;
-    ctx.canvas.height = this.lines * this.rectSize;
+  private drawMainCanvas(){
+    let ctx = this.ctxObject.mainCanvas;
+    ctx = this.setCanvasWidthAndHeight(ctx, this.heddles * this.rectSize, this.lines * this.rectSize);
     this.updateAllColors(this.heddles, this.lines, ctx, false, this.mainCanvasArray);
+  }
 
-    ctx = ctxObject.verCanvas;
-
-    ctx.canvas.width = this.verMax * this.rectSize;
-    ctx.canvas.height = this.lines * this.rectSize;
-    this.drawRects(this.verMax, this.lines, ctx, this.defaultWhite, this.verCanvasArray)
-
-    ctx = ctxObject.horCanvas;
-
-    ctx.canvas.width = this.heddles * this.rectSize;
-    ctx.canvas.height = this.horMax * this.rectSize;
+  private drawHorCanvas(){
+    let ctx = this.ctxObject.horCanvas;
+    ctx = this.setCanvasWidthAndHeight(ctx, this.heddles * this.rectSize, this.horMax * this.rectSize);
     this.drawRects(this.heddles, this.horMax, ctx, this.defaultWhite, this.horCanvasArray)
+  }
 
-    ctx = ctxObject.resultCanvas;
+  private drawVerCanvas(){
+    let ctx = this.ctxObject.verCanvas;
+    ctx = this.setCanvasWidthAndHeight(ctx, this.verMax * this.rectSize, this.lines * this.rectSize);
+    this.drawRects(this.verMax, this.lines, ctx, this.defaultWhite, this.verCanvasArray)
+  }
 
-    ctx.canvas.width = this.verMax * this.rectSize;
-    ctx.canvas.height = this.horMax * this.rectSize;
+  private drawResultCanvas(){
+    let ctx = this.ctxObject.resultCanvas;
+    ctx = this.setCanvasWidthAndHeight(ctx, this.verMax * this.rectSize, this.horMax * this.rectSize);
     this.drawRects(this.verMax, this.horMax, ctx, this.defaultWhite, this.resultCanvasArray)
+  }
 
-    ctx = ctxObject.verColorCanvas;
-
-    ctx.canvas.width = this.rectSize;
-    ctx.canvas.height = this.lines * this.rectSize;
-    this.updateAllColors(1, this.lines, ctx, false)
-
-    ctx = ctxObject.horColorCanvas;
-
-    ctx.canvas.width = this.heddles * this.rectSize;
-    ctx.canvas.height = this.rectSize;
+  private drawHorColorCanvas(){
+    let ctx = this.ctxObject.horColorCanvas;
+    ctx = this.setCanvasWidthAndHeight(ctx, this.heddles * this.rectSize, this.rectSize);
     this.updateAllColors(this.heddles, 1, ctx);
   }
 
-  public presetColorSetter(evt, isHor: boolean){
+  private drawVerColorCanvas(){
+    let ctx = this.ctxObject.verColorCanvas;
+    ctx = this.setCanvasWidthAndHeight(ctx, this.rectSize, this.lines * this.rectSize);
+    this.updateAllColors(1, this.lines, ctx, false)
+  }
+
+  private setCanvasWidthAndHeight(ctx: CanvasRenderingContext2D, width, height): CanvasRenderingContext2D{
+    ctx.canvas.width = width;
+    ctx.canvas.height = height;
+    return ctx;
+  }
+
+  public presetColorSetterHor(evt){
     if(!evt){
-      if(isHor){
-        let presetArray = this.horCPArray;
-        let len = presetArray.length;
-        let horColor = this.horColor;
-        if(!presetArray.includes(horColor)){
-          presetArray.unshift(horColor);
-          if(len > 5){
-            presetArray.splice(6,1);
-          }
-        }
-      }
-      else {
-        let presetArray = this.verCPArray;
-        let len = presetArray.length;
-        let verColor = this.verColor;
-        if(!presetArray.includes(verColor)){
-          presetArray.unshift(verColor);
-          if(len > 5){
-            presetArray.splice(6,1);
-          }
-        }
+      this.presetColorSetter(this.horCPArray, this.horColor);
+    }
+  }
+
+  public presetColorSetterVer(evt){
+    if(!evt){
+      this.presetColorSetter(this.verCPArray, this.verColor)
+    }
+  }
+
+  private presetColorSetter(presetArray: any[], color: string){
+    let len = presetArray.length;
+    if(!presetArray.includes(color)){
+      presetArray.unshift(color);
+      if(len > 5){
+        presetArray.splice(6,1);
       }
     }
   }
@@ -268,144 +283,148 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public mainCanvasListener(evt){
-    let ctx = this.ctxObject[evt.srcElement.id];
+    let ctx = this.ctxObject.mainCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
     if(this.mainCanvasArray[indexY][indexX]){
-      ctx.fillStyle = this.verColorArray[indexY].color;
-      ctx.fillRect(x,y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+      this.drawRect(x, y, ctx, this.verColorArray[indexY]);
       this.mainCanvasArray[indexY][indexX] = 0;
-      this.horUniqueArray[indexX] -= (indexY+1) ** 2;
-      this.verUniqueArray[indexY] -= (indexX+1) ** 2;
     }
     else{
-      ctx.fillStyle = this.horColorArray[indexX].color;
-      ctx.fillRect(x, y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+      this.drawRect(x, y, ctx, this.horColorArray[indexX]);
       this.mainCanvasArray[indexY][indexX] = 1;
-      this.horUniqueArray[indexX] += (indexY+1) ** 2;
-      this.verUniqueArray[indexY] += (indexX+1) ** 2;
     }
   }
 
-
-
   public makeDesign(){
-    let temp = this.canvasDrawingService.makeDesignArray(this.horUniqueArray);
-    let horTaulu = temp.array;
-    let horMax = temp.count;
-    temp = this.canvasDrawingService.makeDesignArray(this.verUniqueArray);
-    let verTaulu = temp.array;
-    let verMax = temp.count;
+    let horUniqueArray = this.fillHorUniqueArray();
+    let verUniqueArray = this.fillVerUniqueArray();
+    let temp = this.canvasDrawingService.makeDesignArray(horUniqueArray);
+    let horArray = temp.array;
+    this.horMax = temp.count;
+    temp = this.canvasDrawingService.makeDesignArray(verUniqueArray);
+    let verArray = temp.array;
+    this.verMax = temp.count;
 
-    if(this.verCanvasArray[0].length !== verMax){
-      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.lines, verMax);
+    if(this.verCanvasArray[0].length !== this.verMax){
+      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.lines, this.verMax);
     }
-    if(this.horCanvasArray.length !== horMax){
-      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, horMax, this.heddles);
+    if(this.horCanvasArray.length !== this.horMax){
+      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, this.horMax, this.heddles);
+    }
+    if(this.resultCanvasArray.length !== this.verMax || this.resultCanvasArray[0].length !== this.horMax){
+      this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, this.horMax, this.verMax);
     }
 
+    this.createVerCanvasArray(verArray);
+    this.createHorCanvasArray(horArray);
+    this.createResultCanvasArray(horArray, verArray);
+
+    this.drawHorCanvas();
+    this.drawVerCanvas();
+    this.drawResultCanvas();
+  }
+
+  private createVerCanvasArray(verArray: number[]){
     for(let i = 0; i < this.lines; i++){
-      if(verTaulu[i] <= verMax && verTaulu[i] > 0){
-        this.verCanvasArray[i][verTaulu[i]-1] = 1;
+      if(verArray[i] <= this.verMax && verArray[i] > 0){
+        this.verCanvasArray[i][verArray[i]-1] = 1;
       }
     }
-    for(let i = 0; i < this.heddles; i++){
-      if(horTaulu[i] > 0){
-        this.horCanvasArray[horTaulu[i]-1][i] = 1;
-      }
-    }
+  }
 
-    this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, horMax, verMax);
+  private createHorCanvasArray(horArray: number[]){
+    for(let i = 0; i < this.heddles; i++){
+      if(horArray[i] > 0){
+        this.horCanvasArray[horArray[i]-1][i] = 1;
+      }
+    }
+  }
+
+  private createResultCanvasArray(horArray: number[], verArray: number[]){
     for (let i = 0; i < this.lines; i++) {
       for (let j = 0; j < this.heddles; j++) {
         if (this.mainCanvasArray[i][j] == 1) {
-          this.resultCanvasArray[horTaulu[j]-1][verTaulu[i]-1] = 1;
+          this.resultCanvasArray[horArray[j]-1][verArray[i]-1] = 1;
         }
       }
     }
+  }
 
-    let ctxObject = this.ctxObject;
-    let ctx = ctxObject.verCanvas;
+  private fillHorUniqueArray(): number[] {
+    let horUniqueArray = this.canvasDrawingService.prepareArray(Array(this.heddles), this.heddles);
+    for(let i = 0; i < this.lines; i++){
+      for(let j = 0; j < this.heddles; j++){
+        if(this.mainCanvasArray[i][j]){
+          horUniqueArray[j] += (i+1) ** 2;
+        }
+      }
+    }
+    return horUniqueArray;
+  }
 
-    ctx.canvas.width = verMax * this.rectSize;
-    ctx.canvas.height = this.lines * this.rectSize;
-    this.drawRects(verMax, this.lines, ctx, this.defaultWhite, this.verCanvasArray)
-
-    ctx = ctxObject.horCanvas;
-
-    ctx.canvas.width = this.heddles * this.rectSize;
-    ctx.canvas.height = horMax * this.rectSize;
-    this.drawRects(this.heddles, horMax, ctx, this.defaultWhite, this.horCanvasArray)
-
-    ctx = ctxObject.resultCanvas;
-
-    ctx.canvas.height = horMax * this.rectSize;
-    ctx.canvas.width = verMax * this.rectSize;
-    this.drawRects(verMax, horMax, ctx, this.defaultWhite, this.resultCanvasArray)
-
-    this.horMax = horMax;
-    this.verMax = verMax;
+  private fillVerUniqueArray(): number[] {
+    let verUniqueArray = this.canvasDrawingService.prepareArray(Array(this.lines), this.lines);
+    for(let i = 0; i < this.lines; i++){
+      for(let j = 0; j < this.heddles; j++){
+        if(this.mainCanvasArray[i][j]){
+          verUniqueArray[i] += (j+1) ** 2;
+        }
+      }
+    }
+    return verUniqueArray;
   }
 
   public resultCanvasListener(evt){
-    let ctx = this.ctxObject[evt.srcElement.id];
+    let ctx = this.ctxObject.resultCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
-    if(this.resultCanvasArray[indexY][indexX]){
-      ctx.fillStyle = this.defaultWhite;
-      ctx.fillRect(x,y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+    if(this.resultCanvasArray[indexY][indexX])
+    {
+      this.drawRect(x, y, ctx, this.defaultWhite)
       this.resultCanvasArray[indexY][indexX] = 0;
     }
     else
     {
-      ctx.fillStyle = this.defaultGray;
-      ctx.fillRect(x, y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+      this.drawRect(x, y, ctx, this.defaultGray);
       this.resultCanvasArray[indexY][indexX] = 1;
     }
     this.checkDrawResult(indexX, indexY);
   }
 
   public horCanvasListener(evt){
-    let ctx = this.ctxObject[evt.srcElement.id];
+    let ctx = this.ctxObject.horCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
-    if(this.horCanvasArray[indexY][indexX]){
-      ctx.fillStyle = this.defaultWhite;
-      ctx.fillRect(x,y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+    if(this.horCanvasArray[indexY][indexX])
+    {
+      this.drawRect(x, y, ctx, this.defaultWhite);
       this.horCanvasArray[indexY][indexX] = 0;
     }
-    else{
+    else
+    {
       for(let i = 0; i < this.horCanvasArray.length; i++){
         if(this.horCanvasArray[i][indexX] === 1){
           this.horCanvasArray[i][indexX] = 0;
-          ctx.fillStyle = this.defaultWhite;
-          ctx.fillRect(x, i * this.rectSize, this.rectSize, this.rectSize);
-          ctx.strokeRect(x, i * this.rectSize, this.rectSize, this.rectSize)
+          this.drawRect(x, i * this.rectSize, ctx, this.defaultWhite);
           this.checkDrawHor(indexX, i)
           break;
         }
       }
-      ctx.fillStyle = this.defaultGray;
-      ctx.fillRect(x, y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+      this.drawRect(x , y, ctx, this.defaultGray);
       this.horCanvasArray[indexY][indexX] = 1;
     }
     this.checkDrawHor(indexX, indexY);
   }
 
   private checkDrawHor(indexX: number, indexY: number){
-    let ctx = this.ctxObject["mainCanvas"];
+    let ctx = this.ctxObject.mainCanvas;
     let size = this.rectSize;
     let lenRes = this.resultCanvasArray.length;
     let lenHor = this.horCanvasArray[0].length;
@@ -417,13 +436,9 @@ export class CanvasDrawingComponent implements OnInit {
             this.mainCanvasArray[j][indexX] = 1 - this.mainCanvasArray[j][indexX];
             for(let b = 0; b < lenHor; b++){
               if(this.mainCanvasArray[j][b]){
-                ctx.fillStyle = this.horColorArray[b].color;
-                ctx.fillRect(b * size, j * size, size, size);
-                ctx.strokeRect(b * size, j * size, size, size);
+                this.drawRect(b * size, j * size, ctx, this.horColorArray[b]);
               }else{
-                ctx.fillStyle = this.verColorArray[j].color;
-                ctx.fillRect(b * size, j * size, size, size);
-                ctx.strokeRect(b * size, j * size, size, size);
+                this.drawRect(b * size, j * size, ctx, this.verColorArray[j]);
               }
             }
           }
@@ -433,7 +448,7 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   private checkDrawResult(indexX: number, indexY: number){
-    let ctx = this.ctxObject["mainCanvas"];
+    let ctx = this.ctxObject.mainCanvas;
     let size = this.rectSize;
     let lenHor = this.horCanvasArray[0].length
     let lenVer = this.verCanvasArray.length;
@@ -443,12 +458,10 @@ export class CanvasDrawingComponent implements OnInit {
           if(this.verCanvasArray[j][indexX]){
             this.mainCanvasArray[j][i] = 1 - this.mainCanvasArray[j][i];
             if(this.mainCanvasArray[j][i]){
-              ctx.fillStyle = this.horColorArray[i].color;
+              this.drawRect(i * size, j * size, ctx, this.horColorArray[i]);
             }else {
-              ctx.fillStyle = this.verColorArray[j].color;
+              this.drawRect(i * size, j * size, ctx, this.verColorArray[j]);
             }
-            ctx.fillRect(i * size, j * size, size, size);
-            ctx.strokeRect(i * size, j * size, size, size);
           }
         }
       }
@@ -456,7 +469,7 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   private checkDrawVer(indexX: number, indexY: number){
-    let ctx = this.ctxObject["mainCanvas"];
+    let ctx = this.ctxObject.mainCanvas;
     let size = this.rectSize;
     let leni = this.resultCanvasArray.length;
     let lenj = this.horCanvasArray[0].length;
@@ -468,13 +481,9 @@ export class CanvasDrawingComponent implements OnInit {
             this.mainCanvasArray[indexY][j] = 1 - this.mainCanvasArray[indexY][j];
             for(let b = 0; b < lenb; b++){
               if(this.mainCanvasArray[b][j]){
-                ctx.fillStyle = this.horColorArray[j].color;
-                ctx.fillRect(j * size, b * size, size, size);
-                ctx.strokeRect(j * size, b * size, size, size);
+                this.drawRect(j * size, b*size, ctx, this.horColorArray[j]);
               }else{
-                ctx.fillStyle = this.verColorArray[b].color;
-                ctx.fillRect(j * size, b * size, size, size);
-                ctx.strokeRect(j * size, b * size, size, size);
+                this.drawRect(j * size, b*size, ctx, this.verColorArray[b]);
               }
             }
           }
@@ -483,194 +492,332 @@ export class CanvasDrawingComponent implements OnInit {
     }
   }
 
+  private isReverse: boolean = false;
+  public showReverse(){
+    this.updateAllColors(this.heddles, this.lines, this.ctxObject.mainCanvas, false, this.mainCanvasArray);
+    this.isReverse = !this.isReverse;
+  }
+
+  public addRowsToMainCanvas(evt){
+    switch(evt.srcElement.id){
+      case "up":
+        this.addRowAbove();
+        this.drawVerRows();
+        break;
+      case "down":
+        this.addRowBelow();
+        this.drawVerRows();
+        break;
+      case "left":
+        this.addRowLeft();
+        this.drawHorRows();
+        break;
+      case "right":
+        this.addRowRight();
+        this.drawHorRows();
+        break;
+    }
+  }
+
+  private addRowAbove(){
+    this.mainCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.heddles), this.heddles));
+    this.verCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.horMax), this.horMax));
+    this.verColorArray.unshift(this.verColor);
+    this.lines++;
+  }
+  
+  private addRowBelow(){
+    this.mainCanvasArray.push(this.canvasDrawingService.prepareArray(Array(this.heddles), this.heddles));
+    this.verCanvasArray.push(this.canvasDrawingService.prepareArray(Array(this.verMax), this.verMax));
+    this.verColorArray.push(this.verColor);
+    this.lines++;
+  }
+
+  private addRowLeft(){
+    for(let i = 0; i < this.lines; i++){
+      this.mainCanvasArray[i].unshift(0);
+    }
+    for(let i = 0; i < this.verMax; i++){
+      this.horCanvasArray[i].unshift(0);
+    }
+    this.horColorArray.unshift(this.horColor)
+    this.heddles++;
+  }
+
+  private addRowRight(){
+    for(let i = 0; i < this.lines; i++){
+      this.mainCanvasArray[i].push(0);
+    }
+    for(let i = 0; i < this.horMax; i++){
+      this.horCanvasArray[i].push(0);
+    }
+    this.horColorArray.push(this.horColor)
+    this.heddles++;
+  }
+
+  public deleteRowsFromMainCanvas(evt){
+    switch(evt.srcElement.id){
+      case "up":
+        this.deleteRowAbove();
+        this.drawVerRows();
+        break;
+      case "down":
+        this.deleteRowBelow();
+        this.drawVerRows();
+        break;
+      case "left":
+        this.deleteRowLeft();
+        this.drawHorRows();
+        break;
+      case "right":
+        this.deleteRowRight();
+        this.drawHorRows();    
+        break;
+    }
+  }
+
+  private drawHorRows(){
+    this.drawMainCanvas();
+    this.drawHorCanvas();
+    this.drawHorColorCanvas();
+  }
+
+  private drawVerRows(){
+    this.drawMainCanvas();
+    this.drawVerCanvas();
+    this.drawVerColorCanvas();
+  }
+
+  private deleteRowAbove(){
+    this.lines--;
+    this.deleteHorRowFromMainCanvasArray(0);
+    this.deleteHorRowFromVerCanvasArray(0);
+    this.deleteHorRowFromVerColorArray(0);
+  }
+
+  private deleteRowBelow(){
+    this.lines--;
+    this.deleteHorRowFromMainCanvasArray(this.lines);
+    this.deleteHorRowFromVerCanvasArray(this.lines);
+    this.deleteHorRowFromVerColorArray(this.lines);
+  }
+
+  private deleteHorRowFromMainCanvasArray(start: number){
+    this.mainCanvasArray.splice(start, 1);
+  }
+
+  private deleteHorRowFromVerCanvasArray(start: number){
+    this.verCanvasArray.splice(start, 1);
+  }
+
+  private deleteHorRowFromVerColorArray(start: number){
+    this.verColorArray.splice(start, 1);
+  }
+
+  private deleteRowLeft(){
+    this.heddles--;
+    this.deleteVerRowFromMainCanvasArray(0, this.lines);
+    this.deleteVerRowFromHorCanvasArray(0, this.verMax);
+    this.deleteVerRowFromHorColorArray(0);
+  }
+
+  private deleteRowRight(){
+    this.heddles--;
+    this.deleteVerRowFromMainCanvasArray(this.heddles, this.lines);
+    this.deleteVerRowFromHorCanvasArray(this.heddles, this.horMax);
+    this.deleteVerRowFromHorColorArray(this.heddles);
+  }
+
+  private deleteVerRowFromMainCanvasArray(start: number, height: number){
+    for(let i = 0; i < height; i++){
+      this.mainCanvasArray[i].splice(start, 1);
+    }
+  }
+
+  private deleteVerRowFromHorCanvasArray(start: number, height){
+    for(let i = 0; i < height; i++){
+      this.horCanvasArray[i].splice(start, 1);
+    }
+  }
+
+  private deleteVerRowFromHorColorArray(start: number){
+    this.horColorArray.splice(start, 1);
+  }
+
   public verCanvasListener(evt){
-    let ctx = this.ctxObject[evt.srcElement.id];
+    let ctx = this.ctxObject.verCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
     if(this.verCanvasArray[indexY][indexX]){
-      ctx.fillStyle = this.defaultWhite;
-      ctx.fillRect(x,y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+      this.drawRect(x, y, ctx, this.defaultWhite);
       this.verCanvasArray[indexY][indexX] = 0;
     }
     else{
       for(let i = 0; i < this.verCanvasArray[0].length; i++){
         if(this.verCanvasArray[indexY][i] === 1){
           this.verCanvasArray[indexY][i] = 0;
-          ctx.fillStyle = this.defaultWhite;
-          ctx.fillRect(i * this.rectSize, y, this.rectSize, this.rectSize);
-          ctx.strokeRect(i * this.rectSize, y, this.rectSize, this.rectSize)
+          this.drawRect(i * this.rectSize, y, ctx, this.defaultWhite);
           this.checkDrawVer(i, indexY)
           break;
         }
       }
-      ctx.fillStyle = this.defaultGray;
-      ctx.fillRect(x, y, this.rectSize, this.rectSize);
-      ctx.strokeRect(x,y, this.rectSize, this.rectSize)
+      this.drawRect(x, y, ctx, this.defaultGray);
       this.verCanvasArray[indexY][indexX] = 1;
     }
     this.checkDrawVer(indexX, indexY)
   }
 
-  public colorBarListener(evt, isHor: boolean){
+  public horColorBarListener(evt){
     let indexX = Math.floor(evt.offsetX / this.rectSize);
-    let indexY = Math.floor(evt.offsetY / this.rectSize);
     let x = indexX * this.rectSize;
+    let ctx = this.ctxObject.horColorCanvas;
+    this.horColorArray[indexX] = this.horColor;
+    this.drawRect(x, 0, ctx, this.horColor);
+    this.updateHorColors(indexX)
+  }
+
+  public verColorBarListener(evt){
+    let indexY = Math.floor(evt.offsetY / this.rectSize);
     let y = indexY * this.rectSize;
-    let canvas = evt.srcElement;
-    let ctx = canvas.getContext("2d");
-    if (isHor){
-      ctx.fillStyle = this.horColor;
-      this.horColorArray[indexX].color = this.horColor;
-      ctx.fillRect(x, 0, this.rectSize, this.rectSize);
-      ctx.strokeRect(x, 0, this.rectSize, this.rectSize);
-    }
-    else {
-      ctx.fillStyle = this.verColor;
-      this.verColorArray[indexY].color = this.verColor;
-      ctx.fillRect(0, y, this.rectSize, this.rectSize);
-      ctx.strokeRect(0, y, this.rectSize, this.rectSize);
-    }
-    this.updateColors(indexX,indexY, isHor)
+    let ctx = this.ctxObject.verColorCanvas;
+    this.verColorArray[indexY] = this.verColor;
+    this.drawRect(0, y, ctx, this.verColor);
+    this.updateVerColors(indexY)
   }
 
-  public fillColorRow(isHor: boolean){
-    if(isHor){
-      let ctx = this.ctxObject["horColorCanvas"];
-      ctx.fillStyle = this.horColor;
-      for(let i = 0; i < this.horColorArray.length; i++){
-        this.horColorArray[i].color = this.horColor;
-        ctx.fillRect(i*this.rectSize, 0, this.rectSize, this.rectSize);
-        ctx.strokeRect(i*this.rectSize, 0, this.rectSize, this.rectSize);
-        this.updateColors(i, 0, true);
-      }
+  public fillHorColorRow(){
+    let ctx = this.ctxObject.horColorCanvas;
+    let len = this.horColorArray.length;
+    for(let i = 0; i < len; i++){
+      this.drawRect(i * this.rectSize, 0, ctx, this.horColor);
+      this.horColorArray[i] = this.horColor;
+      this.updateHorColors(i);
     }
-    else{
-      let ctx = this.ctxObject["verColorCanvas"];
-      ctx.fillStyle = this.verColor;
-      for(let i = 0; i < this.verColorArray.length; i++){
-        this.verColorArray[i].color = this.verColor;
-        ctx.fillRect(0, i*this.rectSize, this.rectSize, this.rectSize);
-        ctx.strokeRect(0, i*this.rectSize, this.rectSize, this.rectSize);
-        this.updateColors(0, i, false);
+  }
+
+  public fillVerColorRow(){
+    let ctx = this.ctxObject.verColorCanvas;
+    let len = this.verColorArray.length;
+    for(let i = 0; i < len; i++){
+      this.drawRect(0, i * this.rectSize, ctx, this.verColor);
+      this.verColorArray[i] = this.verColor;
+      this.updateVerColors(i);
+    }
+  }
+  
+  private updateHorColors(indexX: number){
+    let ctx = this.ctxObject.mainCanvas;
+    let x = this.rectSize * indexX;
+    let color = this.horColorArray[indexX];
+    for (let b = 0; b < this.lines; b++) {
+      if (this.mainCanvasArray[b][indexX]){
+        this.drawRect(x, b * this.rectSize, ctx, color);
       }
     }
   }
 
-  private updateColors(indexX: number, indexY:number, isHor: boolean){
-    let ctx = this.ctxObject["mainCanvas"];
-    let size = this.rectSize;
-    let height = this.lines;
-    let width = this.heddles;
-    let mainCanvasArray = this.mainCanvasArray;
-    if (isHor){
-      let x = size * indexX;
-      ctx.fillStyle = this.horColorArray[indexX].color;
-      for (let b = 0; b < height; b++) {
-        if (mainCanvasArray[b][indexX]){
-          ctx.fillRect(x, b * size, size, size);
-          ctx.strokeRect(x, b * size, size, size);
-        }
-      }
-    }
-    else {
-      let y = size * indexY;
-      ctx.fillStyle = this.verColorArray[indexY].color;
-      for (let b = 0; b < width; b++) {
-        if (!mainCanvasArray[indexY][b]){
-          ctx.fillRect(b * size, y, size, size);
-          ctx.strokeRect(b * size, y, size, size);
-        }
+  private updateVerColors(indexY: number){
+    let ctx = this.ctxObject.mainCanvas;
+    let y = this.rectSize * indexY;
+    let color = this.verColorArray[indexY];
+    for (let b = 0; b < this.heddles; b++) {
+      if (!this.mainCanvasArray[indexY][b]){
+        this.drawRect(b * this.rectSize, y, ctx, color);
       }
     }
   }
 
-  private updateAllColors(width: number, height: number, targetCtx: CanvasRenderingContext2D, isHor: boolean = true, array: any[] = null,
-     x: number = 0, y: number = 0){
+  private updateAllColors(width: number, height: number, targetCtx: CanvasRenderingContext2D, isHor: boolean = true,
+    array: any[] = null){
+
     this.refreshCtx(targetCtx)
     let size: number = this.rectSize;
     for (let a = 0; a < height; a++) {
       for (let b = 0; b < width; b++) {
-        if(array === null || array[a][b] === 0){
-          if(isHor){targetCtx.fillStyle = this.horColorArray[b].color;}
-          else{targetCtx.fillStyle = this.verColorArray[a].color;}
-          targetCtx.fillRect(b * size + x, a * size + y, size, size);
-          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        if(array === null || !array[a][b]){
+          if(isHor)
+          {
+            this.drawRect(b * size, a * size, targetCtx, this.horColorArray[b]);
+          }
+          else
+          {
+            this.drawRect(b * size, a * size, targetCtx, this.verColorArray[a]);
+          }
         }
-        else if(array !== null && array[a][b] === 1){
-          targetCtx.fillStyle = this.horColorArray[b].color;
-          targetCtx.fillRect(b * size + x, a * size + y, size, size);
-          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        else if(array !== null && array[a][b]){
+          this.drawRect(b * size, a * size, targetCtx, this.horColorArray[b]);
         }
       }
     }
   }
 
   private drawRects(width: number, height: number, targetCtx: CanvasRenderingContext2D, 
-    rectColor: string = this.defaultWhite, array: any[] = null,  secondaryColor: string = this.defaultGray,
-    x: number = 0, y: number = 0){
+    rectColor: string = this.defaultWhite, array: any[] = null,  secondaryColor: string = this.defaultGray){
 
     this.refreshCtx(targetCtx)
-    let size: number = this.rectSize;
     for (let a = 0; a < height; a++) {
       for (let b = 0; b < width; b++) {
-        if(array === null || array[a][b] === 0){
-          targetCtx.fillStyle = rectColor;
-          targetCtx.fillRect(b * size + x, a * size + y, size, size);
-          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        if(array === null || !array[a][b]){
+          this.drawRect(b * this.rectSize, a * this.rectSize, targetCtx, rectColor);
         }
-        else if(array !== null && array[a][b] === 1){
-          targetCtx.fillStyle = secondaryColor;
-          targetCtx.fillRect(b * size + x, a * size + y, size, size);
-          targetCtx.strokeRect(b * size + x, a * size + y, size, size);
+        else if(array !== null && array[a][b]){
+          this.drawRect(b * this.rectSize, a * this.rectSize, targetCtx, secondaryColor);
         }
       }
     }
   }
+  
+  private drawRect(x: number, y: number, ctx: CanvasRenderingContext2D, color: string){
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, this.rectSize, this.rectSize);
+    ctx.strokeRect(x, y, this.rectSize, this.rectSize);
+  }
 
   public saveToPng(){
-    let canvases = this.canvasArray
     let tempCanvas = this.renderer2.createElement('canvas');
-    let ctx = tempCanvas.getContext("2d");
-    let size = this.rectSize;
-    let padding = 5;
-    let heddles = this.heddles;
-    let shaft = this.shaft;
-
-    let lines = this.lines
-    let absolutewidth = size * heddles + padding * 2 + size * this.verMax + size;
-    let absoluteheight = size * lines + padding * 2 + size * this.horMax + size;
-    ctx.canvas.width = absolutewidth;
-    ctx.canvas.height = absoluteheight;
-    //ctx.fillStyle = "#fff";
-    //ctx.fillRect(0,0, absolutewidth, absoluteheight)
-    //let len = canvases.length - 1;
-    //ctx.drawImage(canvases[len],0,0)
-    
-    // Yes, I know it is horrible
-    
-    ctx.drawImage(canvases[0], 0, 0)
-    ctx.drawImage(canvases[1], 0, size + padding)
-    ctx.drawImage(canvases[2], heddles * size + padding, size + padding)
-    ctx.drawImage(canvases[3], 0, size * this.horMax + size + padding * 2)
-    ctx.drawImage(canvases[4], heddles * size + padding, size * this.horMax + size + padding * 2)
-    ctx.drawImage(canvases[5], heddles * size + padding * 2 + size * this.verMax, size * this.horMax + size + padding * 2)
-    var base64 = tempCanvas.toDataURL();
-    let blob = this.b64toBlob.ToBlob(base64);
-
-
+    let href = this.saveToPngService.saveToPng(this.canvasArray, tempCanvas, this.rectSize, this.padding, this.heddles, this.lines, this.verMax, this.horMax);
     let link = <HTMLLinkElement>document.getElementById('btn-download')
-    link.href = URL.createObjectURL(blob);
+    link.href = href;
   }
 
   public execute(){
     this.draw();
-    this.executeClicked = true
+    this.executeClicked = true;
+  }
+
+  public shareData(){
+    if(this.isDesign){
+      this.makeDesign();
+      this.horMax >= this.verMax ? this.shaft = this.horMax : this.shaft = this.verMax;
+      this.horMax = this.shaft;
+      this.verMax = this.shaft;
+    }else{
+      this.horMax = this.shaft;
+      this.verMax = this.shaft;
+    }
+    this.shareddata.hasInitialData = true;
+    
+    this.shareddata.shaft = this.shaft;
+    this.shareddata.horMax = this.horMax;
+    this.shareddata.verMax = this.verMax;
+    this.shareddata.lines = this.lines;
+    this.shareddata.heddles = this.heddles;
+    this.shareddata.mainCanvasArray = this.mainCanvasArray;
+    this.shareddata.verCanvasArray = this.verCanvasArray;
+    this.shareddata.horCanvasArray = this.horCanvasArray;
+    this.shareddata.resultCanvasArray = this.resultCanvasArray;
+    this.shareddata.verColorArray = this.verColorArray;
+    this.shareddata.horColorArray = this.horColorArray;
+    this.shareddata.horCPArray = this.horCPArray;
+    this.shareddata.verCPArray = this.verCPArray;
   }
 
   ngOnInit() {
     this.initCanvas();
+    if(this.hadInitialData){
+      this.execute();
+    }
   }
 }
