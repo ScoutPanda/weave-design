@@ -76,6 +76,10 @@
     delete right
   </button>
 </div>
+
+  <button (click)="koira()">
+    koira
+  </button>
 <a *ngIf="!isDesign" (click)="shareData()" [routerLink]=" ['/design']" routerLinkActive="active">
   Weave design
 </a>

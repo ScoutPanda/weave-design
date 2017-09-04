@@ -16,8 +16,8 @@ export class SharedDataService {
 
   //private ctxObject = {} as CanvasCtxInterface;
 
-  public heddles: number = 10;
-  public lines: number = 10;
+  public width: number = 10;
+  public height: number = 10;
   public shaft: number = 2;
   public rectSize: number = 10;
 
