@@ -50,8 +50,66 @@ export class CanvasDrawingService {
       }else{
         values.array[i] = 0;
       }
-      values.i++
       return values;
     }, { set: {}, count: 0, array});
+  }
+
+    public compressColorData(targetArray: string[], targetArray2: string[], mappedHorColors: number[] = [],
+    colorDataMap: string[] = [], set: object = {}, mappedVerColors: number[] = null, count: number = 0){
+    if(targetArray === null){
+      targetArray = targetArray2;
+    }
+    let data = targetArray.reduce(function(values, v) {
+      if(values.set.hasOwnProperty(v)){
+        let len = colorDataMap.length
+        for(let j = 0; j < len; j++){
+          if(colorDataMap[j] === v){
+            values.mappedHorColors.push(values.set[v]);
+          }
+        }
+      }
+      else if (!values.set[v]){
+        values.colorDataMap.push(v)
+        values.set[v] = values.count;
+        values.mappedHorColors.push(values.count);
+        values.count++;
+      }
+      return values;
+    }, { set, count, mappedHorColors, mappedVerColors, colorDataMap});
+    if(data.mappedVerColors === null){
+      return this.compressColorData(null, targetArray2, Array(), colorDataMap, data.set, data.mappedHorColors, data.count);
+    }
+    else
+    {
+      return data;
+    }
+  }
+
+  public compressVerCanvasArray(array: any[]): number[]{
+    let height = array.length;
+    let width = array[0].length;
+    let retArray = this.prepareArray(Array(height), height);
+    for(let i = 0; i < height; i++){
+      for(let j = 0; j < width; j++){
+        if(array[i][j]){
+          retArray[i] = j + 1;
+        }
+      }
+    }
+    return retArray;
+  }
+
+  public compressHorCanvasArray(array: any[]): number[]{
+    let height = array.length;
+    let width = array[0].length;
+    let retArray = this.prepareArray(Array(width), width);
+    for(let i = 0; i < height; i++){
+      for(let j = 0; j < width; j++){
+        if(array[i][j]){
+          retArray[j] = i + 1;
+        }
+      }
+    }
+    return retArray;
   }
 }

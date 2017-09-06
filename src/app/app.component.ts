@@ -9,8 +9,6 @@ import { SharedDataService } from './services/shareddata.service';
   providers: [SharedDataService]
 })
 export class AppComponent {
-  constructor(public auth: AuthService, public sharedDataService: SharedDataService){
-    sharedDataService.horMax = 1000;
-  }
+  constructor(public auth: AuthService, public sharedDataService: SharedDataService){}
   title = 'app works!';
 }

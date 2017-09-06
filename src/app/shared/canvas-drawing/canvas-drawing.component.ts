@@ -15,6 +15,8 @@ import { SaveToPngService } from '../../services/savetopng.service';
 
 import { SharedDataService } from '../../services/shareddata.service';
 
+import { CompressService } from '../../services/compress.service';
+
 @Component({
   selector: 'canvas-drawing',
   templateUrl: './canvas-drawing.component.html',
@@ -59,13 +61,17 @@ export class CanvasDrawingComponent implements OnInit {
   public defaultLineWidth: number = 2;
   public isAdditionMode: boolean = true;
 
+  public canvasName: string;
+  private canvasId: string;
+
   constructor(
     private auth: AuthService,
     private canvasService: CanvasService,
     private canvasDrawingService: CanvasDrawingService,
     private saveToPngService: SaveToPngService,
     private renderer2: Renderer2,
-    private shareddata: SharedDataService
+    private shareddata: SharedDataService,
+    private compressService: CompressService
   ) {
     if(this.shareddata.hasInitialData){
       this.shaft = this.shareddata.shaft;
@@ -79,8 +85,8 @@ export class CanvasDrawingComponent implements OnInit {
       this.resultCanvasArray = this.shareddata.resultCanvasArray;
       this.verColorArray = this.shareddata.verColorArray;
       this.horColorArray = this.shareddata.horColorArray;
-      this.horCPArray = this.shareddata.horCPArray;
-      this.verCPArray = this.shareddata.verCPArray;
+      this.horCPArray = this.shareddata.horCPArray !== null ? this.shareddata.horCPArray : this.horCPArray;
+      this.verCPArray = this.shareddata.verCPArray !== null ? this.shareddata.verCPArray : this.verCPArray;
       this.shareddata.hasInitialData = false;
       this.hadInitialData = true;
     }
@@ -108,16 +114,17 @@ export class CanvasDrawingComponent implements OnInit {
     if(!this.hadInitialData){
       this.horColor = this.defaultHorColor;
       this.verColor = this.defaultVerColor;
-      this.verColorArray = this.canvasDrawingService.prepareColorArray(this.verColorArray, this.height, this.verColor);
-      this.horColorArray = this.canvasDrawingService.prepareColorArray(this.horColorArray, this.width, this.horColor);
-      this.mainCanvasArray = this.canvasDrawingService.prepare2DArray(this.mainCanvasArray, this.height, this.width);
-      this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, this.shaft, this.shaft);
-      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, this.shaft, this.width);
-      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.height, this.shaft);
+      this.verColorArray = this.canvasDrawingService.prepareColorArray(Array(), this.height, this.verColor);
+      this.horColorArray = this.canvasDrawingService.prepareColorArray(Array(), this.width, this.horColor);
+      this.mainCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.height, this.width);
+      this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.shaft, this.shaft);
+      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.shaft, this.width);
+      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.height, this.shaft);
+    }
+    if(this.isDesign){
+      this.updateHorMaxAndVerMax();
     }
     this.drawCanvases();
-
-    this.updateHorMaxAndVerMax();
 
     this.hadInitialData = false;
   }
@@ -270,9 +277,10 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public save(){
-    let compressedHorCanvasArray = this.compressHorCanvasArray(this.horCanvasArray);
-    let compressedVerCanvasArray = this.compressVerCanvasArray(this.verCanvasArray);
-    const canvasData = new CanvasDataModel(this.verColorArray, this.horColorArray, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
+    let compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, Array(this.width));
+    let compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, Array(this.height));
+    let data = this.compressService.compressColorData(this.horColorArray, this.verColorArray);
+    const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
     const canvas = new CanvasModel('koira', JSON.stringify(canvasData));
     this.canvasService.addCanvas(canvas)
         .subscribe(
@@ -286,36 +294,18 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public koira(){
-    console.log(this.compressHorCanvasArray(this.horCanvasArray));
-    console.log(this.compressVerCanvasArray(this.verCanvasArray));
-  }
-
-  private compressVerCanvasArray(array: any[]): number[]{
-    let height = array.length;
-    let width = array[0].length;
-    let retArray = this.canvasDrawingService.prepareArray(Array(height), height);
-    for(let i = 0; i < height; i++){
-      for(let j = 0; j < width; j++){
-        if(array[i][j]){
-          retArray[i] = j + 1;
-        }
-      }
-    }
-    return retArray;
-  }
-
-  private compressHorCanvasArray(array: any[]): number[]{
-    let height = array.length;
-    let width = array[0].length;
-    let retArray = this.canvasDrawingService.prepareArray(Array(width), width);
-    for(let i = 0; i < height; i++){
-      for(let j = 0; j < width; j++){
-        if(array[i][j]){
-          retArray[j] = i + 1;
-        }
-      }
-    }
-    return retArray;
+    console.log(this.horCanvasArray);
+    let compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, this.canvasDrawingService.prepareArray(Array(this.width), this.width));
+    console.log(compressedHorCanvasArray)
+    let compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, this.canvasDrawingService.prepareArray(Array(this.height), this.height));
+    console.log(compressedVerCanvasArray)
+    let data = this.compressService.compressColorData(this.verColorArray, this.horColorArray);
+    const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
+    console.log(data)
+    const canvas = new CanvasModel('koira', JSON.stringify(canvasData));
+    let canvasData1 = JSON.parse(canvas.canvasData);
+    console.log(this.compressService.decompressHorCanvasArray(canvasData1.compressedHorCanvas, this.horCanvasArray))
+    console.log(this.compressService.decompressVerCanvasArray(canvasData1.compressedVerCanvas, this.verCanvasArray))
   }
 
   public mainCanvasListener(evt){
@@ -344,52 +334,20 @@ export class CanvasDrawingComponent implements OnInit {
     let verArray = temp.array;
     this.verMax = temp.count;
 
-    if(this.verCanvasArray[0].length !== this.verMax){
-      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(this.verCanvasArray, this.height, this.verMax);
-    }
-    if(this.horCanvasArray.length !== this.horMax){
-      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(this.horCanvasArray, this.horMax, this.width);
-    }
-    if(this.resultCanvasArray.length !== this.verMax || this.resultCanvasArray[0].length !== this.horMax){
-      this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(this.resultCanvasArray, this.horMax, this.verMax);
-    }
+    this.verCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.height, this.verMax);
+    this.horCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.horMax, this.width);
+    this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.horMax, this.verMax);
 
-    console.log(verArray)
-    console.log(horArray)
-
-    this.createVerCanvasArray(verArray);
-    this.createHorCanvasArray(horArray);
-    this.createResultCanvasArray(horArray, verArray);
+    this.verCanvasArray = this.compressService.decompressVerCanvasArray(verArray, this.verCanvasArray);
+    this.horCanvasArray = this.compressService.decompressHorCanvasArray(horArray, this.horCanvasArray);
+    this.resultCanvasArray = this.compressService.decompressResultCanvasArray(horArray, verArray, this.mainCanvasArray, this.resultCanvasArray);
+    console.log(this.verCanvasArray)
+    console.log(this.horCanvasArray)
+    console.log(this.resultCanvasArray)
 
     this.drawHorCanvas();
     this.drawVerCanvas();
     this.drawResultCanvas();
-  }
-
-  private createVerCanvasArray(verArray: number[]){
-    for(let i = 0; i < this.height; i++){
-      if(verArray[i] <= this.verMax && verArray[i] > 0){
-        this.verCanvasArray[i][verArray[i]-1] = 1;
-      }
-    }
-  }
-
-  private createHorCanvasArray(horArray: number[]){
-    for(let i = 0; i < this.width; i++){
-      if(horArray[i] > 0){
-        this.horCanvasArray[horArray[i]-1][i] = 1;
-      }
-    }
-  }
-
-  private createResultCanvasArray(horArray: number[], verArray: number[]){
-    for (let i = 0; i < this.height; i++) {
-      for (let j = 0; j < this.width; j++) {
-        if (this.mainCanvasArray[i][j] == 1) {
-          this.resultCanvasArray[horArray[j]-1][verArray[i]-1] = 1;
-        }
-      }
-    }
   }
 
   private fillHorUniqueArray(): number[] {
@@ -698,14 +656,14 @@ export class CanvasDrawingComponent implements OnInit {
         if(this.verCanvasArray[indexY][i] === 1){
           this.verCanvasArray[indexY][i] = 0;
           this.drawRect(i * this.rectSize, y, ctx, this.defaultWhite);
-          this.checkDrawVer(i, indexY)
+          this.checkDrawVer(i, indexY);
           break;
         }
       }
       this.drawRect(x, y, ctx, this.defaultGray);
       this.verCanvasArray[indexY][indexX] = 1;
     }
-    this.checkDrawVer(indexX, indexY)
+    this.checkDrawVer(indexX, indexY);
   }
 
   public horColorBarListener(evt){
@@ -714,7 +672,7 @@ export class CanvasDrawingComponent implements OnInit {
     let ctx = this.ctxObject.horColorCanvas;
     this.horColorArray[indexX] = this.horColor;
     this.drawRect(x, 0, ctx, this.horColor);
-    this.updateHorColors(indexX)
+    this.updateHorColors(indexX);
   }
 
   public verColorBarListener(evt){
@@ -723,7 +681,7 @@ export class CanvasDrawingComponent implements OnInit {
     let ctx = this.ctxObject.verColorCanvas;
     this.verColorArray[indexY] = this.verColor;
     this.drawRect(0, y, ctx, this.verColor);
-    this.updateVerColors(indexY)
+    this.updateVerColors(indexY);
   }
 
   public fillHorColorRow(){
@@ -816,7 +774,7 @@ export class CanvasDrawingComponent implements OnInit {
   public saveToPng(){
     let tempCanvas = this.renderer2.createElement('canvas');
     let href = this.saveToPngService.saveToPng(this.canvasArray, tempCanvas, this.rectSize, this.padding, this.width, this.height, this.verMax, this.horMax);
-    let link = <HTMLLinkElement>document.getElementById('btn-download')
+    let link = <HTMLLinkElement>document.getElementById('btn-download');
     link.href = href;
   }
 

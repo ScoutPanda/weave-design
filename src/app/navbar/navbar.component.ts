@@ -29,9 +29,9 @@ export class NavbarComponent implements OnInit {
     }
   }
 
-  getUserId(){
+  /*getUserId(){
     return localStorage.getItem("id_token");
-  }
+  }*/
 
   loggedIn(){
     return this.auth.loggedIn();

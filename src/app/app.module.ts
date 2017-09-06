@@ -23,6 +23,7 @@ import { CanvasListComponent } from './user/canvas-list.component';
 import { AuthGuard } from './services/auth.guard';
 import { B64ToBlobService } from './services/b64-to-blob.service';
 import { SharedDataService } from './services/shareddata.service';
+import { CompressService } from './services/compress.service';
 
 @NgModule({
   imports: [
@@ -50,7 +51,8 @@ import { SharedDataService } from './services/shareddata.service';
     CanvasService,
     AuthGuard,
     B64ToBlobService,
-    SharedDataService
+    SharedDataService,
+    CompressService
   ],
   bootstrap: [
     AppComponent,

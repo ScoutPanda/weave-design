@@ -36,5 +36,8 @@ export class SharedDataService {
   public defaultLineWidth: number = 2;
   public isAdditionMode: boolean = true;
 
+  public canvasName: string;
+  public canvasId: string;
+
   public hasInitialData: boolean = false;
 }

@@ -1,10 +1,10 @@
 export class CanvasDataModel {
     constructor(
-        public verColorCanvas: any[],
-        public horColorCanvas: any[],
-        public verCanvas?: any[],
-        public horCanvas?: any[],
-        public resultCanvas?: any[],
-        public mainCanvas?: any[]
+        public verColorCanvas: number[],
+        public horColorCanvas: number[],
+        public colorDataMap: string[],
+        public compressedVerCanvas: number[],
+        public compressedHorCanvas: number[],
+        public resultCanvas: number[]
     ){}
 }
