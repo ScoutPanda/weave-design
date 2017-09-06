@@ -18,6 +18,6 @@
         Logout
       </button>
 
-      <div *ngIf="loggedIn()"><a [routerLink]="['user', getUserId()]" routerLinkActive="active">{{email}}</a></div>
+      <div *ngIf="loggedIn()"><a [routerLink]="['user']" routerLinkActive="active">{{email}}</a></div>
       <button (click)="getEmail()">Set email</button>
 </nav>
