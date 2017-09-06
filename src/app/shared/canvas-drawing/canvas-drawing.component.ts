@@ -283,7 +283,7 @@ export class CanvasDrawingComponent implements OnInit {
     compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, compressedVerCanvasArray);
     let data = this.compressService.compressColorData(this.horColorArray, this.verColorArray);
     const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
-    const canvas = new CanvasModel('koira', JSON.stringify(canvasData));
+    const canvas = new CanvasModel('kissa', JSON.stringify(canvasData));
     this.canvasService.addCanvas(canvas)
         .subscribe(
           data => console.log(data),
