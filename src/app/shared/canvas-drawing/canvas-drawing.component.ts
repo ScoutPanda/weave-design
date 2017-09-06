@@ -277,8 +277,10 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public save(){
-    let compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, Array(this.width));
-    let compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, Array(this.height));
+    let compressedHorCanvasArray = this.canvasDrawingService.prepareArray(Array(this.width), this.width);
+    compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, compressedHorCanvasArray);
+    let compressedVerCanvasArray = this.canvasDrawingService.prepareArray(Array(this.height), this.height);
+    compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, compressedVerCanvasArray);
     let data = this.compressService.compressColorData(this.horColorArray, this.verColorArray);
     const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
     const canvas = new CanvasModel('koira', JSON.stringify(canvasData));
@@ -294,18 +296,6 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public koira(){
-    console.log(this.horCanvasArray);
-    let compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, this.canvasDrawingService.prepareArray(Array(this.width), this.width));
-    console.log(compressedHorCanvasArray)
-    let compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, this.canvasDrawingService.prepareArray(Array(this.height), this.height));
-    console.log(compressedVerCanvasArray)
-    let data = this.compressService.compressColorData(this.verColorArray, this.horColorArray);
-    const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
-    console.log(data)
-    const canvas = new CanvasModel('koira', JSON.stringify(canvasData));
-    let canvasData1 = JSON.parse(canvas.canvasData);
-    console.log(this.compressService.decompressHorCanvasArray(canvasData1.compressedHorCanvas, this.horCanvasArray))
-    console.log(this.compressService.decompressVerCanvasArray(canvasData1.compressedVerCanvas, this.verCanvasArray))
   }
 
   public mainCanvasListener(evt){
