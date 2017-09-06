@@ -6,16 +6,16 @@ import { SharedDataService } from '../services/shareddata.service';
 import { CompressService } from '../services/compress.service';
 
 @Component({
-    selector: 'app-canvas-list',
+  selector: 'app-canvas-list',
   template: `
   <h2>CANVASES</h2>
     <ul>
         <li *ngFor="let canvas of canvases">
-            <span>{{canvas.canvasName}} <a href="/design/'{{canvas.canvasId}}'">To design</a><a href="/maker/'{{canvas.canvasId}}'">To maker</a></span><button (click)=remove(canvas)>remove</button>
-            <a (click)="takeCanvasToDesign(true)" [routerLink]=" ['/design']" routerLinkActive="active">
+            <span>{{canvas.canvasName}}</span><button (click)=remove(canvas)>remove</button>
+            <a (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
               Weave design
             </a>
-            <a (click)="takeCanvasToDesign(false)" [routerLink]=" ['/maker']" routerLinkActive="active">
+            <a (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
               Pattern maker
             </a>
         </li>
