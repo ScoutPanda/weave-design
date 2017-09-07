@@ -10,17 +10,16 @@ import { CompressService } from '../services/compress.service';
   template: `
   <h2>CANVASES</h2>
     <ul>
-        <li *ngFor="let canvas of canvases">
-            <span>{{canvas.canvasName}}</span><button (click)=remove(canvas)>remove</button>
-            <a (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
-              Weave design
-            </a>
-            <a (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
-              Pattern maker
-            </a>
-        </li>
+      <li *ngFor="let canvas of canvases">
+        <span>{{canvas.canvasName}}</span><button (click)=remove(canvas)>remove</button>
+        <a (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
+          Weave design
+        </a>
+        <a (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
+          Pattern maker
+        </a>
+      </li>
     </ul>
-    <button (click)="koira()">koira</button>
   `,
 })
 export class CanvasListComponent implements OnInit {
@@ -33,7 +32,7 @@ export class CanvasListComponent implements OnInit {
     private shareddata: SharedDataService,
     private compressService: CompressService
   ) {
-    this.canvases[0] = this.shareddata.canvas;
+    //this.canvases[0] = this.shareddata.canvas;
   }
 
   public remove(canvas: CanvasModel)
@@ -90,11 +89,11 @@ export class CanvasListComponent implements OnInit {
   }
 
   ngOnInit() {
-    /*this.canvasService.getCanvases()
+    this.canvasService.getCanvases()
       .subscribe((
         canvases: CanvasModel[]) => {
           this.canvases = canvases;
         }
-      );*/
+      );
   }
 }
