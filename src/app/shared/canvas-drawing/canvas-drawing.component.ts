@@ -61,7 +61,7 @@ export class CanvasDrawingComponent implements OnInit {
   public defaultLineWidth: number = 2;
   public isAdditionMode: boolean = true;
 
-  public canvasName: string;
+  public canvasName: string = "";
   private canvasId: string;
 
   constructor(
@@ -303,7 +303,9 @@ export class CanvasDrawingComponent implements OnInit {
     return this.auth.loggedIn()
   }
 
-  public koira(){
+  public koira()
+  {
+    /*
     let compressedHorCanvasArray = this.canvasDrawingService.prepareArray(Array(this.width), this.width);
     compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, compressedHorCanvasArray);
     let compressedVerCanvasArray = this.canvasDrawingService.prepareArray(Array(this.height), this.height);
@@ -311,7 +313,7 @@ export class CanvasDrawingComponent implements OnInit {
     let data = this.compressService.compressColorData(this.horColorArray, this.verColorArray);
     const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
     const canvas = new CanvasModel('kissa', JSON.stringify(canvasData));
-    this.shareddata.canvas = canvas;
+    this.shareddata.canvas = canvas;*/
   }
 
   public mainCanvasListener(evt){

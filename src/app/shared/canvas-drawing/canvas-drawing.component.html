@@ -93,6 +93,6 @@
 <input type="number" id="lines" [(ngModel)]="height">
 <label for="size">Size</label>
 <input type="number" id="size" [(ngModel)]="rectSize">
-<input *ngIf="loggedIn()" type="text" id="canvasName" [(ngModel)]="canvasName" />
+<input *ngIf="loggedIn()" type="text" id="canvasName" placeholder="Write canvas name here" [(ngModel)]="canvasName" />
 <button (click)="save()" *ngIf="loggedIn()">Save!</button>
 <a href="#" class="button" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download</a>

@@ -18,8 +18,8 @@ export class CanvasService {
     const token = localStorage.getItem('id_token')
       ? '?token=' + localStorage.getItem('id_token')
       : '';
-    return this.http.post('https://weave-design.herokuapp.com/api/canvas' + token, body, {headers: headers})
-    //return this.http.post('http://localhost:4200/api/canvas' + token, body, {headers: headers})
+    //return this.http.post('https://weave-design.herokuapp.com/api/canvas' + token, body, {headers: headers})
+    return this.http.post('/api/canvas' + token, body, {headers: headers})
       .map((response: Response) => response.json())
       .catch((error: Response) => Observable.throw(error.json()));
   }
@@ -28,8 +28,8 @@ export class CanvasService {
     const token = localStorage.getItem('id_token')
       ? '?token=' + localStorage.getItem('id_token')
       : '';
-    //return this.http.get('http://localhost:4200/api/canvas' + token)
-    return this.http.get('https://weave-design.herokuapp.com/api/canvas' + token)
+    return this.http.get('/api/canvas' + token)
+    //return this.http.get('https://weave-design.herokuapp.com/api/canvas' + token)
       .map((response: Response) => {
         const canvases = response.json().obj
         let transformedCanvases: CanvasModel[] = [];
@@ -55,16 +55,16 @@ export class CanvasService {
     /*const token = localStorage.getItem('id_token')
       ? '?token=' + localStorage.getItem('id_token')
       : '';*/
-    return this.http.patch('https://weave-design.herokuapp.com/api/canvas' + canvas.canvasId, body, {headers: headers})
-    //return this.http.patch('http://localhost:4200/api/canvas/' + canvas.canvasId, body, {headers: headers})
+    //return this.http.patch('https://weave-design.herokuapp.com/api/canvas' + canvas.canvasId, body, {headers: headers})
+    return this.http.patch('/api/canvas/' + canvas.canvasId, body, {headers: headers})
       .map((response: Response) => response.json())
       .catch((error: Response) => Observable.throw(error.json()));
   }
 
   public removeCanvas(canvas: CanvasModel){
     this.canvases.splice(this.canvases.indexOf(canvas), 1);
-    //return this.http.delete('http://localhost:4200/api/canvas/' + canvas.canvasId)
-    return this.http.delete('https://weave-design.herokuapp.com/api/canvas/' + canvas.canvasId)
+    return this.http.delete('/api/canvas/' + canvas.canvasId)
+    //return this.http.delete('https://weave-design.herokuapp.com/api/canvas/' + canvas.canvasId)
       .map((response: Response) => response.json())
       .catch((error: Response) => Observable.throw(error.json()));
   }

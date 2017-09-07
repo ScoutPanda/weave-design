@@ -24,28 +24,28 @@ router.get('/', function(req,res){
         });
 })
 
-function checkCount (){
-    User.count({authUserId: user_id}, function(err, count){
+function checkCount (user_id, req, res){
+    Canvas.count({authUserId: user_id}, function(err, count){
         if(err){
             return res.status(500).json({
                 title: 'An error occured',
                 error: err
             });
         }
-        if(count > 5){
+        if(count > 9){
             return res.status(418).json({
-                title: '',
+                title: "I'm NOT a coffee pot >:(",
                 error: 'Not enough storage space'
             });    
         }
         else
         {
-            this.saveCanvasData();
+            saveCanvasData(user_id, req, res);
         }
     });
 }
 
-function saveCanvasData(){
+function saveCanvasData(user_id, req, res){
     User.findOne({authUserId: user_id}, function(err, user){
         if(err){
         return res.status(500).json({
@@ -78,34 +78,7 @@ function saveCanvasData(){
 router.post('/', function(req, res){
     var decoded = jwt.decode(req.query.token);
     var user_id = decoded.sub;
-    this.checkCount();
-    /*User.findOne({authUserId: user_id}, function(err, user){
-        if(err){
-          return res.status(500).json({
-                title: 'An error occured',
-                error: err
-            });
-        }
-        var canvas = new Canvas({
-            canvasName: req.body.canvasName,
-            canvasData: req.body.canvasData,
-            authUserId: user_id
-        });
-        canvas.save(function(err, result){
-            if(err){
-                return res.status(500).json({
-                    title: 'An error occured',
-                    error: err
-                });
-            }
-            user.canvases.push(result);
-            user.save();
-            res.status(201).json({
-                message: 'Saved canvas data',
-                obj: result
-            });
-        });
-    });*/
+    checkCount(user_id, req, res);
 });
 
 router.patch('/:id', function(req, res){
