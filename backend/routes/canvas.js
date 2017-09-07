@@ -24,25 +24,62 @@ router.get('/', function(req,res){
         });
 })
 
+function checkCount (){
+    User.count({authUserId: user_id}, function(err, count){
+        if(err){
+            return res.status(500).json({
+                title: 'An error occured',
+                error: err
+            });
+        }
+        if(count > 5){
+            return res.status(418).json({
+                title: '',
+                error: 'Not enough storage space'
+            });    
+        }
+        else
+        {
+            this.saveCanvasData();
+        }
+    });
+}
+
+function saveCanvasData(){
+    User.findOne({authUserId: user_id}, function(err, user){
+        if(err){
+        return res.status(500).json({
+                title: 'An error occured',
+                error: err
+            });
+        }
+        var canvas = new Canvas({
+            canvasName: req.body.canvasName,
+            canvasData: req.body.canvasData,
+            authUserId: user_id
+        });
+        canvas.save(function(err, result){
+            if(err){
+                return res.status(500).json({
+                    title: 'An error occured',
+                    error: err
+                });
+            }
+            user.canvases.push(result);
+            user.save();
+            res.status(201).json({
+                message: 'Saved canvas data',
+                obj: result
+            });
+        });
+    });
+}
+
 router.post('/', function(req, res){
     var decoded = jwt.decode(req.query.token);
     var user_id = decoded.sub;
-    User.count({authUserId: user_id}, function(err, count){
-        /*if(count > 5){    
-            return res.status(418).json({
-                title: '',
-                error: 'Not enough storage space'
-            });
-        }*/
-    }).then(results => {
-        if(result.count > 5){    
-            return res.status(418).json({
-                title: '',
-                error: 'Not enough storage space'
-            });
-        }
-    });
-    User.findOne({authUserId: user_id}, function(err, user){
+    this.checkCount();
+    /*User.findOne({authUserId: user_id}, function(err, user){
         if(err){
           return res.status(500).json({
                 title: 'An error occured',
@@ -68,7 +105,7 @@ router.post('/', function(req, res){
                 obj: result
             });
         });
-    });
+    });*/
 });
 
 router.patch('/:id', function(req, res){
