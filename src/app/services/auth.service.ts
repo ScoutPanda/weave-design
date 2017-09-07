@@ -6,15 +6,27 @@ declare var Auth0Lock: any;
 @Injectable()
 export class AuthService {
 
-  lock = new Auth0Lock('07yOOxsIRAqf2z09zMuF7mdKDpFQUvra', 'weave-design.eu.auth0.com', {
+
+  private options = {
     loginAfterSignUp: false,
     auth: {
       redirect: false
       //redirectUrl: 'http://localhost:4200/callback'
+    },
+    languageDictionary: {
+      success: {
+        signUp: 'Thanks for signing up. Please confirm your email before signing in.'
+      }
     }
-  })
+  };
 
-  constructor() { 
+  lock = new Auth0Lock(
+    '07yOOxsIRAqf2z09zMuF7mdKDpFQUvra', 
+    'weave-design.eu.auth0.com', 
+    this.options
+  )
+
+  constructor() {
     this.lock.on("authenticated", authResult => {
       this.lock.getUserInfo(authResult.accessToken, function (error, profile){
         if(error){
