@@ -49,6 +49,8 @@ export class CanvasListComponent implements OnInit {
 
   public takeCanvasToDesign(canvas: CanvasModel, toDesign: boolean){
     let canvasData = JSON.parse(canvas.canvasData);
+    console.log("koiradata" + canvasData)
+    console.log(canvas)
     let horMax = this.compressService.getMaxFromCompressedHorArray(canvasData.compressedHorCanvas);
     let verMax = this.compressService.getMaxFromCompressedVerArray(canvasData.compressedVerCanvas);
     let width = canvasData.compressedHorCanvas.length;
