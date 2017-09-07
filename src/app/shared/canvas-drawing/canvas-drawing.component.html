@@ -20,7 +20,6 @@
       </canvas>
   </div>
 </div>
-<button (click)="save()" *ngIf="loggedIn()">Save!</button>
 <button (click)="execute()">
   click me
 </button>
@@ -86,9 +85,6 @@
 <a *ngIf="isDesign" (click)="shareData()" [routerLink]=" ['/maker']" routerLinkActive="active">
   Pattern maker
 </a>
-<a (click)="koira()" [routerLink]=" ['/user']" routerLinkActive="active">
-  User!
-</a>
 <label *ngIf="!isDesign" for="shaft">Shaft</label>
 <input *ngIf="!isDesign" type="number" id="shaft" [(ngModel)]="shaft">
 <label for="heddles">Heddles</label>
@@ -97,4 +93,6 @@
 <input type="number" id="lines" [(ngModel)]="height">
 <label for="size">Size</label>
 <input type="number" id="size" [(ngModel)]="rectSize">
+<input *ngIf="loggedIn()" type="text" id="canvasName" [(ngModel)]="canvasName" />
+<button (click)="save()" *ngIf="loggedIn()">Save!</button>
 <a href="#" class="button" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download</a>

@@ -27,6 +27,14 @@ router.get('/', function(req,res){
 router.post('/', function(req, res){
     var decoded = jwt.decode(req.query.token);
     var user_id = decoded.sub;
+    User.count({authUserId: user_id}, function(err, count){
+        if(count > 5){    
+            return res.status(418).json({
+                title: '',
+                error: 'Not enough storage space'
+            });
+        }
+    });
     User.findOne({authUserId: user_id}, function(err, user){
         if(err){
           return res.status(500).json({
