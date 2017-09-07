@@ -20,18 +20,21 @@ import { CompressService } from '../services/compress.service';
             </a>
         </li>
     </ul>
+    <button (click)="koira()">koira</button>
   `,
 })
 export class CanvasListComponent implements OnInit {
 
-  public canvases: CanvasModel[];
+  public canvases: CanvasModel[] = [];
   public canvas: CanvasModel;
 
   constructor(
     private canvasService: CanvasService,
     private shareddata: SharedDataService,
     private compressService: CompressService
-  ) {}
+  ) {
+    this.canvases[0] = this.shareddata.canvas;
+  }
 
   public remove(canvas: CanvasModel)
   {
@@ -41,24 +44,31 @@ export class CanvasListComponent implements OnInit {
         );
   }
 
+  public koira(){
+    console.log(this.shareddata.canvas)
+  }
+
   public takeCanvasToDesign(canvas: CanvasModel, toDesign: boolean){
     let canvasData = JSON.parse(canvas.canvasData);
-    let horCanvasArray = this.compressService.decompressHorCanvasArray(canvasData.compressedHorCanvas, Array());
-    let verCanvasArray = this.compressService.decompressVerCanvasArray(canvasData.compressedVerCanvas, Array());
-    let colorCanvasData = this.compressService.decompressColorData(canvasData.mappedHorColors, canvasData.mappedVerColors, canvasData.colorDataMap);
-    let width = verCanvasArray.length;
-    let height = horCanvasArray.length;
     let horMax = this.compressService.getMaxFromCompressedHorArray(canvasData.compressedHorCanvas);
     let verMax = this.compressService.getMaxFromCompressedVerArray(canvasData.compressedVerCanvas);
+    let width = canvasData.compressedHorCanvas.length;
+    let height = canvasData.compressedVerCanvas.length;
+    let horCanvasArray = this.compressService.prepare2DArray(horMax, width);
+    let verCanvasArray = this.compressService.prepare2DArray(height, verMax)
+    horCanvasArray = this.compressService.decompressHorCanvasArray(canvasData.compressedHorCanvas, horCanvasArray);
+    verCanvasArray = this.compressService.decompressVerCanvasArray(canvasData.compressedVerCanvas, verCanvasArray);
+    let mainCanvasArray = this.compressService.prepare2DArray(height, width);
+    mainCanvasArray = this.compressService.constructMainCanvasArray(canvasData.compressedVerCanvas, canvasData.compressedHorCanvas, canvasData.resultCanvas, mainCanvasArray);
+    let colorCanvasData = this.compressService.decompressColorData(canvasData.mappedVerColors, canvasData.mappedHorColors, canvasData.colorDataMap);
     
     let shaft = 0;
-    
+    horMax >= verMax ? shaft = horMax : shaft = verMax;
+
     if(!toDesign){
       horMax = shaft;
       verMax = shaft;
     }
-
-    horMax >= verMax ? shaft = horMax : shaft = verMax;
 
     this.shareddata.hasInitialData = true;
     this.shareddata.shaft = shaft;
@@ -68,42 +78,23 @@ export class CanvasListComponent implements OnInit {
     this.shareddata.width = width;
     this.shareddata.verCanvasArray = verCanvasArray;
     this.shareddata.horCanvasArray = horCanvasArray;
-    this.shareddata.resultCanvasArray = canvasData.resultCanvasArray;
+    this.shareddata.resultCanvasArray = canvasData.resultCanvas;
     this.shareddata.verColorArray = colorCanvasData.verColorArray;
     this.shareddata.horColorArray = colorCanvasData.horColorArray;
+    this.shareddata.mainCanvasArray = mainCanvasArray;
     this.shareddata.horCPArray = null;
     this.shareddata.verCPArray = null;
 
     this.shareddata.canvasName = canvas.canvasName;
     this.shareddata.canvasId = canvas.canvasId;
   }
-    /*public shareData(toDesign: boolean){
-      this.horMax >= this.verMax ? this.shaft = this.horMax : this.shaft = this.verMax;
-      this.horMax = this.shaft;
-      this.verMax = this.shaft;
-    this.shareddata.hasInitialData = true;
-    
-    this.shareddata.shaft = this.shaft;
-    this.shareddata.horMax = this.horMax;
-    this.shareddata.verMax = this.verMax;
-    this.shareddata.height = this.height;
-    this.shareddata.width = this.width;
-    this.shareddata.mainCanvasArray = this.mainCanvasArray;
-    this.shareddata.verCanvasArray = this.verCanvasArray;
-    this.shareddata.horCanvasArray = this.horCanvasArray;
-    this.shareddata.resultCanvasArray = this.resultCanvasArray;
-    this.shareddata.verColorArray = this.verColorArray;
-    this.shareddata.horColorArray = this.horColorArray;
-    this.shareddata.horCPArray = this.horCPArray;
-    this.shareddata.verCPArray = this.verCPArray;
-  }*/
 
   ngOnInit() {
-    this.canvasService.getCanvases()
+    /*this.canvasService.getCanvases()
       .subscribe((
         canvases: CanvasModel[]) => {
           this.canvases = canvases;
         }
-      );
+      );*/
   }
 }

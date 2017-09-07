@@ -89,6 +89,7 @@ export class CanvasDrawingComponent implements OnInit {
       this.verCPArray = this.shareddata.verCPArray !== null ? this.shareddata.verCPArray : this.verCPArray;
       this.shareddata.hasInitialData = false;
       this.hadInitialData = true;
+      console.log(this.mainCanvasArray)
     }
   }
 
@@ -296,6 +297,14 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public koira(){
+    let compressedHorCanvasArray = this.canvasDrawingService.prepareArray(Array(this.width), this.width);
+    compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, compressedHorCanvasArray);
+    let compressedVerCanvasArray = this.canvasDrawingService.prepareArray(Array(this.height), this.height);
+    compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, compressedVerCanvasArray);
+    let data = this.compressService.compressColorData(this.horColorArray, this.verColorArray);
+    const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
+    const canvas = new CanvasModel('kissa', JSON.stringify(canvasData));
+    this.shareddata.canvas = canvas;
   }
 
   public mainCanvasListener(evt){

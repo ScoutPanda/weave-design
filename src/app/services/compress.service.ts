@@ -189,4 +189,22 @@ export class CompressService {
     }
     return resultCanvasArray;
   }
+
+  public constructMainCanvasArray(verCanvasArray: number[], horCanvasArray: number[], resultCanvasArray: number[], mainCanvasArray: number[]): number[]{
+    for(let i = 0; i < horCanvasArray.length; i++){
+      if(horCanvasArray[i] !== 0){
+        for(let b = 0; b < resultCanvasArray.length; b++){
+          if(resultCanvasArray[horCanvasArray[i]-1][b]){
+            for(let j = 0; j < verCanvasArray.length; j++){
+              if(verCanvasArray[j] === b+1){
+                mainCanvasArray[j][i] = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    return mainCanvasArray;
+  }
+  
 }

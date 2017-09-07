@@ -86,6 +86,9 @@
 <a *ngIf="isDesign" (click)="shareData()" [routerLink]=" ['/maker']" routerLinkActive="active">
   Pattern maker
 </a>
+<a (click)="koira()" [routerLink]=" ['/user']" routerLinkActive="active">
+  User!
+</a>
 <label *ngIf="!isDesign" for="shaft">Shaft</label>
 <input *ngIf="!isDesign" type="number" id="shaft" [(ngModel)]="shaft">
 <label for="heddles">Heddles</label>

@@ -40,4 +40,6 @@ export class SharedDataService {
   public canvasId: string;
 
   public hasInitialData: boolean = false;
+
+  public canvas: any;
 }
