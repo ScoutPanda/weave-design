@@ -9,7 +9,7 @@ export class AuthService {
   lock = new Auth0Lock('07yOOxsIRAqf2z09zMuF7mdKDpFQUvra', 'weave-design.eu.auth0.com', {
     loginAfterSignUp: false,
     auth: {
-      //redirect: false
+      redirect: false
       //redirectUrl: 'http://localhost:4200/callback'
     }
   })
