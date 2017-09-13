@@ -13,7 +13,7 @@ const appRoutes: Routes = [
   { path: '', component: HomeComponent},
   { path: 'help', component: HelpComponent},
   { path: 'design', component: DesignComponent},
-  { path: 'maker', component: PatternMakerComponent},
+  { path: 'maker', component: PatternMakerComponent, canDeactivate: [AuthGuard]},
   { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
   { path: '**', component: NotFoundComponent }
 ];

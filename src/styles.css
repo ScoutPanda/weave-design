@@ -1,4 +1,66 @@
 /* You can add global styles to this file, and also import other style files */
+h2{
+  color: #311B92;
+}
+
+p{
+  color: #000000;
+}
+
+table{
+  display: inline;
+}
+
+#info{
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+#canvasDrawingContainer{
+    margin-left: 20px;
+    margin-bottom: 50px;
+}
+
 .app-background {
   background-color: #FAFAFA;
+}
+
+.box-shadow{
+  box-shadow: 0 2px 5px 0 #311B92;
+}
+
+.btn-secondary{
+  background-color: #EF6C00;
+  box-shadow: 0 2px 5px 0 #E65100;
+  border-color: #E65100;
+}
+
+.btn-secondary:hover{
+  background-color: #E65100;
+  border-color: #E65100;
+  box-shadow: 0 1px 3px 0 #E65100;
+}
+
+.btn-secondary:active{
+  background-color: #E63100;
+  border-color: #E65100;
+  box-shadow: 0 0px 0px 0 #E65100;
+}
+
+.textboxHighlight{
+  border: 0;
+  box-shadow: 0 0 5px 0 #FF3D00;
+  border-radius: 5px;
+}
+
+.textboxHighlight:focus{
+  outline-color: #E65100;
+}
+
+.mxw-5{
+  max-width: 50px;
+}
+
+.designContainer{
+  margin: 15px 30px 0px 10px;
 }

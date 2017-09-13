@@ -8,24 +8,28 @@ import { CompressService } from '../services/compress.service';
 @Component({
   selector: 'app-canvas-list',
   template: `
-  <h2>CANVASES</h2>
-    <ul>
-      <li *ngFor="let canvas of canvases">
-        <span>{{canvas.canvasName}}</span><button (click)=remove(canvas)>remove</button>
-        <a (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
-          Weave design
-        </a>
-        <a (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
-          Pattern maker
-        </a>
-      </li>
-    </ul>
+  <div class="ml-3">
+    <h3>Canvas list</h3>
+      <ul *ngIf="!noData">
+        <li *ngFor="let canvas of canvases">
+          <span>{{canvas.canvasName}}</span><button (click)=remove(canvas)>remove</button>
+          <a (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
+            Weave design
+          </a>
+          <a (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
+            Pattern maker
+          </a>
+        </li>
+      </ul>
+      <h4 *ngIf="noData">No canvas data found. What are you waiting for? Go and make something! :)</h4>
+    </div>
   `,
 })
 export class CanvasListComponent implements OnInit {
 
   public canvases: CanvasModel[] = [];
   public canvas: CanvasModel;
+  public noData: boolean = false;
 
   constructor(
     private canvasService: CanvasService,
@@ -39,20 +43,13 @@ export class CanvasListComponent implements OnInit {
   {
     this.canvasService.removeCanvas(canvas)
         .subscribe(
-            result => console.log(result)
+            result => alert("CanvasRemoved"),
+            error => alert("Something went wrong!")
         );
-  }
-
-  public koira(){
-    console.log(this.shareddata.canvas)
   }
 
   public takeCanvasToDesign(canvas: CanvasModel, toDesign: boolean){
     let canvasData = JSON.parse(canvas.canvasData);
-    console.log("koiradata" + canvasData)
-    console.log(canvas)
-    console.log(canvas.canvasName, canvas.authUserId, canvas.canvasId)
-    console.log(canvasData.compressedHorCanvas)
     let horMax = this.compressService.getMaxFromCompressedHorArray(canvasData.compressedHorCanvas);
     let verMax = this.compressService.getMaxFromCompressedVerArray(canvasData.compressedVerCanvas);
     let width = canvasData.compressedHorCanvas.length;
@@ -99,5 +96,8 @@ export class CanvasListComponent implements OnInit {
           this.canvases = canvases;
         }
       );
+    if(this.canvases.length == 0){
+      this.noData = true;
+    }
   }
 }

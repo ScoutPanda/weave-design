@@ -27,6 +27,11 @@ export class AuthService {
   )
 
   constructor() {
+    
+  }
+
+  login() {
+    this.lock.show();
     this.lock.on("authenticated", authResult => {
       this.lock.getUserInfo(authResult.accessToken, function (error, profile){
         if(error){
@@ -38,10 +43,6 @@ export class AuthService {
         localStorage.setItem('email', profile.email);
       });
     });
-  }
-
-  login() {
-    this.lock.show();
   }
 
   logout() {

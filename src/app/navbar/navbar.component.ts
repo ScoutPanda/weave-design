@@ -27,6 +27,7 @@ export class NavbarComponent implements OnInit {
     }else{
       this.email = '';
     }
+    return email;
   }
 
   /*getUserId(){
@@ -34,7 +35,11 @@ export class NavbarComponent implements OnInit {
   }*/
 
   loggedIn(){
-    return this.auth.loggedIn();
+    if(this.auth.loggedIn()){
+      this.email = this.getEmail();
+      return true;
+    }
+    return false;
   }
 
   ngOnInit() {

@@ -17,6 +17,8 @@ import { SharedDataService } from '../../services/shareddata.service';
 
 import { CompressService } from '../../services/compress.service';
 
+import { isNumeric } from 'rxjs/util/isNumeric';
+
 @Component({
   selector: 'canvas-drawing',
   templateUrl: './canvas-drawing.component.html',
@@ -37,6 +39,8 @@ export class CanvasDrawingComponent implements OnInit {
   private verMax: number = 2;
   private padding: number = 5;
 
+  public saveSuccess: boolean = true;
+
   private ctxObject = {} as CanvasCtxInterface;
 
   private hadInitialData: boolean = false;
@@ -44,7 +48,13 @@ export class CanvasDrawingComponent implements OnInit {
   public width: number = 10;
   public height: number = 10;
   public shaft: number = 2;
-  public rectSize: number = 10;
+  public rectSize: number = 14;
+
+  public visibleWidth: number = 10;
+  public visibleHeight: number = 10;
+  public visibleShaft: number = 2;
+  public visibleRectSize: number = 14;
+  public visibleCanvasName: string = "";
 
   public horCPArray: any[] = ['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)'];
   public verCPArray: any[] = ['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)'];
@@ -114,9 +124,10 @@ export class CanvasDrawingComponent implements OnInit {
     if(!this.hadInitialData){
       this.initializeDrawArea();
     }
-    if(this.isDesign){
+    if(!this.isDesign){
       this.updateHorMaxAndVerMax();
     }
+    this.isReverse = false;
     this.drawCanvases();
 
     this.hadInitialData = false;
@@ -133,13 +144,27 @@ export class CanvasDrawingComponent implements OnInit {
       this.verCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.height, this.shaft);
   }
 
+  public changeShaftSize(shaft: number){
+    if(isNumeric(shaft)){
+      if(shaft > 0 && shaft < 101){
+        this.shaft = shaft;
+        this.visibleShaft = shaft;
+        this.updateShaft();
+      }
+      alert("Shaft needs to be between 1 and 100");
+    }
+    alert("Shaft needs to be a number");
+  }
+
   public updateShaft(){
+    let rowsWereDeleted = false;
     if(this.shaft > this.verCanvasArray[0].length){
       this.addVerRowsToVerCanvasArray();
     }
     else if (this.shaft < this.verCanvasArray[0].length)
     {
       this.removeVerRowsFromCanvasArrays();
+      rowsWereDeleted = true;
     }
     if(this.shaft > this.horCanvasArray.length)
     {
@@ -148,13 +173,69 @@ export class CanvasDrawingComponent implements OnInit {
     else if (this.shaft < this.horCanvasArray.length)
     {
       this.removeHorRowsFromCanvasArrays();
+      rowsWereDeleted = true;
+    }
+    
+    this.updateHorMaxAndVerMax();
+
+    if(rowsWereDeleted){
+      let compressedHorCanvasArray = this.canvasDrawingService.prepareArray(Array(this.width), this.width);
+      compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, compressedHorCanvasArray);
+      let compressedVerCanvasArray = this.canvasDrawingService.prepareArray(Array(this.height), this.height);
+      compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, compressedVerCanvasArray);
+      let mainCanvasArray = this.compressService.prepare2DArray(this.height, this.width);
+      this.mainCanvasArray = this.compressService.constructMainCanvasArray(compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray, mainCanvasArray);
+      
+      //this.checkIfMainCanvasMatchesSides();
+      this.drawMainCanvas();
     }
 
-    this.updateHorMaxAndVerMax();
     this.drawHorCanvas();
     this.drawVerCanvas();
     this.drawResultCanvas();
   }
+
+  private isMainCanvasEmpty(){
+    for(let i = 0; i < this.height; i++){
+      for(let j = 0; j < this.width; j++){
+        if(this.mainCanvasArray[i][j]){
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  /*private checkIfMainCanvasMatchesSides(){
+    let hasAllData = false;
+    for(let i = 0; i < this.height; i++){
+      for(let j = 0; j < this.width; j++){
+        if(this.mainCanvasArray[i][j]){
+          for(let a = 0; a < this.horCanvasArray.length; a++){
+            if(this.horCanvasArray[a][j]){
+              for(let b = 0; b < this.resultCanvasArray.length; b++){
+                if(this.resultCanvasArray[a][b]){
+                  for(let c = 0; c < this.verCanvasArray[0].length; c++){
+                    if(this.verCanvasArray[i][c]){
+                    hasAllData = true;
+                    break;
+                    }
+                  hasAllData = false;
+                  }
+                  break;
+                }
+                hasAllData = false;
+              }
+              break;
+            }
+            hasAllData = false;
+          }
+          if(!hasAllData){
+            this.mainCanvasArray[i][j] = 0;
+          }
+        }
+      }
+    }
+  }*/
 
   private addVerRowsToVerCanvasArray(){
     let len = this.shaft - this.verCanvasArray[0].length;
@@ -200,6 +281,23 @@ export class CanvasDrawingComponent implements OnInit {
     let len = this.horCanvasArray.length - this.shaft;
     this.horCanvasArray.splice(0, len);
     this.resultCanvasArray.splice(0,len);
+  }
+
+  public changeRectSize(rectSize: number){
+    if(isNumeric(rectSize)){
+      if(rectSize > 2 && rectSize < 101){
+        this.rectSize = rectSize;
+        this.drawCanvases();
+      }
+      else
+      {
+        alert("The rectangle size needs to be between 3 and 100");
+      }
+    }
+    else
+    {
+      alert("The size must be numerical");
+    }
   }
 
   public drawCanvases(){
@@ -280,11 +378,31 @@ export class CanvasDrawingComponent implements OnInit {
     }
   }
 
+  public saveCanvas(canvasName: string){
+    
+    if(!this.isMainCanvasEmpty()){
+      if(canvasName.length < 51){
+        this.canvasName = canvasName;
+        this.save();
+      }
+      else
+      {
+        alert("Canvas name must be shorter than 50 characters");
+      }
+    }
+    else
+    {
+      alert("Cannot save an empty canvas!")
+    }
+  }
+
   public save(){
     if(this.canvasName === ""){
       this.canvasName = "koiran karvan kosto " + Math.floor(Math.random() * 10);
     }
-    this.makeDesign();
+    if(this.isDesign){
+      this.makeDesign();
+    }
     let compressedHorCanvasArray = this.canvasDrawingService.prepareArray(Array(this.width), this.width);
     compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, compressedHorCanvasArray);
     let compressedVerCanvasArray = this.canvasDrawingService.prepareArray(Array(this.height), this.height);
@@ -294,8 +412,8 @@ export class CanvasDrawingComponent implements OnInit {
     const canvas = new CanvasModel(this.canvasName, JSON.stringify(canvasData));
     this.canvasService.addCanvas(canvas)
         .subscribe(
-          data => console.log(data),
-          error => console.log(error)
+          data => alert("Canvas saved!"),
+          error => alert("Was not able to save canvas. Are you sure you have less than 10 canvases saved?")
         )
   }
 
@@ -303,33 +421,36 @@ export class CanvasDrawingComponent implements OnInit {
     return this.auth.loggedIn()
   }
 
-  public koira()
-  {
-    /*
-    let compressedHorCanvasArray = this.canvasDrawingService.prepareArray(Array(this.width), this.width);
-    compressedHorCanvasArray = this.compressService.compressHorCanvasArray(this.horCanvasArray, compressedHorCanvasArray);
-    let compressedVerCanvasArray = this.canvasDrawingService.prepareArray(Array(this.height), this.height);
-    compressedVerCanvasArray = this.compressService.compressVerCanvasArray(this.verCanvasArray, compressedVerCanvasArray);
-    let data = this.compressService.compressColorData(this.horColorArray, this.verColorArray);
-    const canvasData = new CanvasDataModel(data.mappedVerColors, data.mappedHorColors, data.colorDataMap, compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray);
-    const canvas = new CanvasModel('kissa', JSON.stringify(canvasData));
-    this.shareddata.canvas = canvas;*/
-  }
-
   public mainCanvasListener(evt){
     let ctx = this.ctxObject.mainCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
+    let color = "";
+    if(indexY < 0){
+      indexY = this.incrementValueByOne(indexY);
+    }
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
     if(this.mainCanvasArray[indexY][indexX]){
-      this.drawRect(x, y, ctx, this.verColorArray[indexY]);
+      color = this.verColorArray[indexY];
+      if(this.isReverse){
+        color = this.horColorArray[indexX];
+      }
+      this.drawRect(x, y, ctx, color);
       this.mainCanvasArray[indexY][indexX] = 0;
     }
     else{
-      this.drawRect(x, y, ctx, this.horColorArray[indexX]);
+      color = this.horColorArray[indexX];
+      if(this.isReverse){
+        color = this.verColorArray[indexY];
+      }
+      this.drawRect(x, y, ctx, color);
       this.mainCanvasArray[indexY][indexX] = 1;
     }
+  }
+
+  private incrementValueByOne(index: number){
+      return ++index;
   }
 
   public makeDesign(){
@@ -383,6 +504,9 @@ export class CanvasDrawingComponent implements OnInit {
     let ctx = this.ctxObject.resultCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
+    if(indexY < 0){
+      indexY = this.incrementValueByOne(indexY);
+    }
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
     if(this.resultCanvasArray[indexY][indexX])
@@ -402,6 +526,9 @@ export class CanvasDrawingComponent implements OnInit {
     let ctx = this.ctxObject.horCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
+    if(indexY < 0){
+      indexY = this.incrementValueByOne(indexY);
+    }
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
     if(this.horCanvasArray[indexY][indexX])
@@ -431,6 +558,7 @@ export class CanvasDrawingComponent implements OnInit {
     let lenRes = this.resultCanvasArray.length;
     let lenHor = this.horCanvasArray[0].length;
     let lenVer = this.verCanvasArray.length;
+    let color = "";
     for(let i = 0; i < lenRes; i++){
       if(this.resultCanvasArray[indexY][i]){
         for(let j = 0; j < lenVer; j++){
@@ -438,9 +566,17 @@ export class CanvasDrawingComponent implements OnInit {
             this.mainCanvasArray[j][indexX] = 1 - this.mainCanvasArray[j][indexX];
             for(let b = 0; b < lenHor; b++){
               if(this.mainCanvasArray[j][b]){
-                this.drawRect(b * size, j * size, ctx, this.horColorArray[b]);
+                color = this.horColorArray[b];
+                if(this.isReverse){
+                  color = this.verColorArray[j];
+                }
+                this.drawRect(b * size, j * size, ctx, color);
               }else{
-                this.drawRect(b * size, j * size, ctx, this.verColorArray[j]);
+                color = this.verColorArray[j];
+                if(this.isReverse){
+                  color = this.horColorArray[b];
+                }
+                this.drawRect(b * size, j * size, ctx, color);
               }
             }
           }
@@ -454,15 +590,24 @@ export class CanvasDrawingComponent implements OnInit {
     let size = this.rectSize;
     let lenHor = this.horCanvasArray[0].length
     let lenVer = this.verCanvasArray.length;
+    let color = "";
     for(let i = 0; i < lenHor; i++){
       if(this.horCanvasArray[indexY][i]){
         for(let j = 0; j < lenVer; j++){
           if(this.verCanvasArray[j][indexX]){
             this.mainCanvasArray[j][i] = 1 - this.mainCanvasArray[j][i];
             if(this.mainCanvasArray[j][i]){
-              this.drawRect(i * size, j * size, ctx, this.horColorArray[i]);
+              color = this.horColorArray[i];
+              if(this.isReverse){
+                color = this.verColorArray[j];
+              }
+              this.drawRect(i * size, j * size, ctx, color);
             }else {
-              this.drawRect(i * size, j * size, ctx, this.verColorArray[j]);
+              color = this.verColorArray[j];
+              if(this.isReverse){
+                color = this.horColorArray[i];
+              }
+              this.drawRect(i * size, j * size, ctx, color);
             }
           }
         }
@@ -476,6 +621,7 @@ export class CanvasDrawingComponent implements OnInit {
     let leni = this.resultCanvasArray.length;
     let lenj = this.horCanvasArray[0].length;
     let lenb = this.verCanvasArray.length;
+    let color = "";
     for(let i = 0; i < leni; i++){
       if(this.resultCanvasArray[i][indexX]){
         for(let j = 0; j < lenj; j++){
@@ -483,9 +629,17 @@ export class CanvasDrawingComponent implements OnInit {
             this.mainCanvasArray[indexY][j] = 1 - this.mainCanvasArray[indexY][j];
             for(let b = 0; b < lenb; b++){
               if(this.mainCanvasArray[b][j]){
-                this.drawRect(j * size, b*size, ctx, this.horColorArray[j]);
+                color = this.horColorArray[j];
+                if(this.isReverse){
+                  color = this.verColorArray[b];
+                }
+                this.drawRect(j * size, b*size, ctx, color);
               }else{
-                this.drawRect(j * size, b*size, ctx, this.verColorArray[b]);
+                color = this.verColorArray[b];
+                if(this.isReverse){
+                  color = this.horColorArray[j];
+                }
+                this.drawRect(j * size, b*size, ctx, color);
               }
             }
           }
@@ -496,27 +650,35 @@ export class CanvasDrawingComponent implements OnInit {
 
   private isReverse: boolean = false;
   public showReverse(){
-    this.updateAllColors(this.width, this.height, this.ctxObject.mainCanvas, false, this.mainCanvasArray);
     this.isReverse = !this.isReverse;
+    this.updateAllColors(this.width, this.height, this.ctxObject.mainCanvas, false, this.mainCanvasArray);
   }
 
   public addRowsToMainCanvas(evt){
     switch(evt.srcElement.id){
       case "up":
-        this.addRowAbove();
-        this.drawVerRows();
+        if(this.height < 501){
+          this.addRowAbove();
+          this.drawVerRows();
+        }
         break;
       case "down":
-        this.addRowBelow();
-        this.drawVerRows();
+        if(this.height < 501){
+          this.addRowBelow();
+          this.drawVerRows();
+        }
         break;
       case "left":
-        this.addRowLeft();
-        this.drawHorRows();
+        if(this.width < 501){
+          this.addRowLeft();
+          this.drawHorRows();
+        }
         break;
       case "right":
-        this.addRowRight();
-        this.drawHorRows();
+        if(this.width < 501){
+          this.addRowRight();
+          this.drawHorRows();
+        }
         break;
     }
   }
@@ -525,14 +687,19 @@ export class CanvasDrawingComponent implements OnInit {
     this.mainCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.width), this.width));
     this.verCanvasArray.unshift(this.canvasDrawingService.prepareArray(Array(this.horMax), this.horMax));
     this.verColorArray.unshift(this.verColor);
-    this.height++;
+    this.incrementHeight();
   }
   
   private addRowBelow(){
     this.mainCanvasArray.push(this.canvasDrawingService.prepareArray(Array(this.width), this.width));
     this.verCanvasArray.push(this.canvasDrawingService.prepareArray(Array(this.verMax), this.verMax));
     this.verColorArray.push(this.verColor);
+    this.incrementHeight();
+  }
+
+  private incrementHeight(){
     this.height++;
+    this.visibleHeight = this.height;
   }
 
   private addRowLeft(){
@@ -543,7 +710,7 @@ export class CanvasDrawingComponent implements OnInit {
       this.horCanvasArray[i].unshift(0);
     }
     this.horColorArray.unshift(this.horColor)
-    this.width++;
+    this.incrementWidth();
   }
 
   private addRowRight(){
@@ -554,26 +721,39 @@ export class CanvasDrawingComponent implements OnInit {
       this.horCanvasArray[i].push(0);
     }
     this.horColorArray.push(this.horColor)
+    this.incrementWidth();
+  }
+
+  private incrementWidth(){
     this.width++;
+    this.visibleWidth = this.width;
   }
 
   public deleteRowsFromMainCanvas(evt){
     switch(evt.srcElement.id){
       case "up":
-        this.deleteRowAbove();
-        this.drawVerRows();
+        if(this.height > 1){
+          this.deleteRowAbove();
+          this.drawVerRows();
+        }
         break;
       case "down":
-        this.deleteRowBelow();
-        this.drawVerRows();
+        if(this.height > 1){
+          this.deleteRowBelow();
+          this.drawVerRows();
+        }
         break;
       case "left":
-        this.deleteRowLeft();
-        this.drawHorRows();
+        if(this.width > 1){
+          this.deleteRowLeft();
+          this.drawHorRows();
+        }
         break;
       case "right":
-        this.deleteRowRight();
-        this.drawHorRows();    
+        if(this.width > 1){
+          this.deleteRowRight();
+          this.drawHorRows();
+        }    
         break;
     }
   }
@@ -591,17 +771,22 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   private deleteRowAbove(){
-    this.height--;
+    this.decrementHeight();
     this.deleteHorRowFromMainCanvasArray(0);
     this.deleteHorRowFromVerCanvasArray(0);
     this.deleteHorRowFromVerColorArray(0);
   }
 
   private deleteRowBelow(){
-    this.height--;
+    this.decrementHeight();
     this.deleteHorRowFromMainCanvasArray(this.height);
     this.deleteHorRowFromVerCanvasArray(this.height);
     this.deleteHorRowFromVerColorArray(this.height);
+  }
+
+  private decrementHeight(){
+    this.height--;
+    this.visibleHeight = this.height;
   }
 
   private deleteHorRowFromMainCanvasArray(start: number){
@@ -617,17 +802,22 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   private deleteRowLeft(){
-    this.width--;
+    this.decrementWidth();
     this.deleteVerRowFromMainCanvasArray(0, this.height);
     this.deleteVerRowFromHorCanvasArray(0, this.verMax);
     this.deleteVerRowFromHorColorArray(0);
   }
 
   private deleteRowRight(){
-    this.width--;
+    this.decrementWidth();
     this.deleteVerRowFromMainCanvasArray(this.width, this.height);
     this.deleteVerRowFromHorCanvasArray(this.width, this.horMax);
     this.deleteVerRowFromHorColorArray(this.width);
+  }
+  
+  private decrementWidth(){
+    this.width--;
+    this.visibleWidth = this.width;
   }
 
   private deleteVerRowFromMainCanvasArray(start: number, height: number){
@@ -650,6 +840,9 @@ export class CanvasDrawingComponent implements OnInit {
     let ctx = this.ctxObject.verCanvas;
     let indexX = Math.floor(evt.offsetX / this.rectSize);
     let indexY = Math.floor(evt.offsetY / this.rectSize);
+    if(indexY < 0){
+      indexY = this.incrementValueByOne(indexY);
+    }
     let x =  indexX * this.rectSize;
     let y = indexY * this.rectSize;
     if(this.verCanvasArray[indexY][indexX]){
@@ -682,6 +875,9 @@ export class CanvasDrawingComponent implements OnInit {
 
   public verColorBarListener(evt){
     let indexY = Math.floor(evt.offsetY / this.rectSize);
+    if(indexY < 0){
+      indexY = this.incrementValueByOne(indexY);
+    }
     let y = indexY * this.rectSize;
     let ctx = this.ctxObject.verColorCanvas;
     this.verColorArray[indexY] = this.verColor;
@@ -698,6 +894,28 @@ export class CanvasDrawingComponent implements OnInit {
       this.updateHorColors(i);
     }
   }
+  
+  private updateHorColors(indexX: number){
+    let ctx = this.ctxObject.mainCanvas;
+    let x = this.rectSize * indexX;
+    let color = "";
+    for (let b = 0; b < this.height; b++) {
+      if (this.mainCanvasArray[b][indexX]){
+        color = this.horColorArray[indexX];
+        if(this.isReverse){
+          color = this.verColorArray[b];
+        }
+        this.drawRect(x, b * this.rectSize, ctx, color);
+      }
+      else{
+        color = this.verColorArray[b];
+        if(this.isReverse){
+          color = this.horColorArray[indexX];
+        }
+        this.drawRect(x, b * this.rectSize, ctx, color);
+      }
+    }
+  }
 
   public fillVerColorRow(){
     let ctx = this.ctxObject.verColorCanvas;
@@ -708,24 +926,24 @@ export class CanvasDrawingComponent implements OnInit {
       this.updateVerColors(i);
     }
   }
-  
-  private updateHorColors(indexX: number){
-    let ctx = this.ctxObject.mainCanvas;
-    let x = this.rectSize * indexX;
-    let color = this.horColorArray[indexX];
-    for (let b = 0; b < this.height; b++) {
-      if (this.mainCanvasArray[b][indexX]){
-        this.drawRect(x, b * this.rectSize, ctx, color);
-      }
-    }
-  }
 
   private updateVerColors(indexY: number){
     let ctx = this.ctxObject.mainCanvas;
     let y = this.rectSize * indexY;
-    let color = this.verColorArray[indexY];
+    let color = "";
     for (let b = 0; b < this.width; b++) {
       if (!this.mainCanvasArray[indexY][b]){
+        color = this.verColorArray[indexY];
+        if(this.isReverse){
+          color = this.horColorArray[b];
+        }
+        this.drawRect(b * this.rectSize, y, ctx, color);
+      }
+      else{
+        color = this.horColorArray[b];
+        if(this.isReverse){
+          color = this.verColorArray[indexY];
+        }
         this.drawRect(b * this.rectSize, y, ctx, color);
       }
     }
@@ -734,21 +952,34 @@ export class CanvasDrawingComponent implements OnInit {
   private updateAllColors(width: number, height: number, ctx: CanvasRenderingContext2D, isHor: boolean = true,
     array: any[] = null){
 
-    this.refreshCtx(ctx)
+    this.refreshCtx(ctx);
+    let color = "";
     for (let a = 0; a < height; a++) {
       for (let b = 0; b < width; b++) {
         if(array === null || !array[a][b]){
           if(isHor)
           {
-            this.drawRect(b * this.rectSize, a * this.rectSize, ctx, this.horColorArray[b]);
+            color = this.horColorArray[b];
+            if(this.isReverse){
+              color = this.verColorArray[a];
+            }
+            this.drawRect(b * this.rectSize, a * this.rectSize, ctx, color);
           }
           else
           {
-            this.drawRect(b * this.rectSize, a * this.rectSize, ctx, this.verColorArray[a]);
+            color = this.verColorArray[a];
+            if(this.isReverse){
+              color = this.horColorArray[b];
+            }
+            this.drawRect(b * this.rectSize, a * this.rectSize, ctx, color);
           }
         }
         else if(array !== null && array[a][b]){
-          this.drawRect(b * this.rectSize, a * this.rectSize, ctx, this.horColorArray[b]);
+          color = this.horColorArray[b];
+          if(this.isReverse){
+            color = this.verColorArray[a];
+          }
+          this.drawRect(b * this.rectSize, a * this.rectSize, ctx, color);
         }
       }
     }
@@ -786,39 +1017,84 @@ export class CanvasDrawingComponent implements OnInit {
   public execute(){
     this.draw();
     this.executeClicked = true;
+    localStorage.setItem("isDirty", "true");
+  }
+
+  public createNewCanvas(shaft: number, width: number, height: number){
+    if(this.isDesign){
+      shaft = 2;
+    }
+    if(isNumeric(shaft) && isNumeric(width), isNumeric(height)){
+      if(shaft > 0 && shaft < 101 && width > 0 && width < 501 && height > 0 && height < 501){
+        this.shaft = shaft;
+        this.width = width;
+        this.height = height;
+        this.execute();
+      }
+      else
+      {
+        alert("The limits are: Shaft between 2 and 100, heddles and lines between 2 and 500");
+      }
+    }
+    else
+    {
+      alert("Shaft, heddles and lines have to be numbers");
+    }
   }
 
   public shareData(){
-    if(this.isDesign){
-      this.makeDesign();
-      this.horMax >= this.verMax ? this.shaft = this.horMax : this.shaft = this.verMax;
-      this.horMax = this.shaft;
-      this.verMax = this.shaft;
-    }else{
-      this.horMax = this.shaft;
-      this.verMax = this.shaft;
+    if(!this.isMainCanvasEmpty()){
+      localStorage.setItem("isDirty", "false");
+      if(this.isDesign){
+        this.makeDesign();
+        this.horMax >= this.verMax ? this.shaft = this.horMax : this.shaft = this.verMax;
+        if(this.horMax < this.shaft){
+          let len = this.shaft - this.horMax;
+          for(let i = 0; i < len; i++){
+            this.addHorRowsToCanvasArrays();
+          }
+        }
+        else if(this.verMax < this.shaft){
+          let len = this.shaft - this.verMax;
+          for(let i = 0; i < len; i++){
+            this.addVerRowsToVerCanvasArray();
+          }
+        }
+        this.horMax = this.shaft;
+        this.verMax = this.shaft;
+      }else{
+        this.horMax = this.shaft;
+        this.verMax = this.shaft;
+      }
+      this.shareddata.hasInitialData = true;
+      
+      this.shareddata.shaft = this.shaft;
+      this.shareddata.horMax = this.horMax;
+      this.shareddata.verMax = this.verMax;
+      this.shareddata.height = this.height;
+      this.shareddata.width = this.width;
+      this.shareddata.mainCanvasArray = this.mainCanvasArray;
+      this.shareddata.verCanvasArray = this.verCanvasArray;
+      this.shareddata.horCanvasArray = this.horCanvasArray;
+      this.shareddata.resultCanvasArray = this.resultCanvasArray;
+      this.shareddata.verColorArray = this.verColorArray;
+      this.shareddata.horColorArray = this.horColorArray;
+      this.shareddata.horCPArray = this.horCPArray;
+      this.shareddata.verCPArray = this.verCPArray;
     }
-    this.shareddata.hasInitialData = true;
-    
-    this.shareddata.shaft = this.shaft;
-    this.shareddata.horMax = this.horMax;
-    this.shareddata.verMax = this.verMax;
-    this.shareddata.height = this.height;
-    this.shareddata.width = this.width;
-    this.shareddata.mainCanvasArray = this.mainCanvasArray;
-    this.shareddata.verCanvasArray = this.verCanvasArray;
-    this.shareddata.horCanvasArray = this.horCanvasArray;
-    this.shareddata.resultCanvasArray = this.resultCanvasArray;
-    this.shareddata.verColorArray = this.verColorArray;
-    this.shareddata.horColorArray = this.horColorArray;
-    this.shareddata.horCPArray = this.horCPArray;
-    this.shareddata.verCPArray = this.verCPArray;
+    else
+    {
+      localStorage.setItem("canvasIsEmpty", "true");
+    }
   }
 
   ngOnInit() {
     this.initCanvases();
     if(this.hadInitialData){
       this.execute();
+    }
+    else{
+      localStorage.setItem('isDirty', 'false');
     }
   }
 }

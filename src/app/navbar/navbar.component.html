@@ -1,23 +1,42 @@
-<nav>
-  <a [routerLink]=" ['./'] " routerLinkActive="active">
-    Home
-  </a>
-  <a [routerLink]=" ['./design']" routerLinkActive="active">
-    Weave design
-  </a>
-  <a [routerLink]=" ['./maker']" routerLinkActive="active">
-    Pattern maker
-  </a>
-  <a [routerLink]=" ['./help']" routerLinkActive="active">
-    Help
-  </a>
-  <button (click)="login()" *ngIf="!loggedIn()">
+<nav class="navbar navbar-expand-lg navbar-dark box-shadow" style="background-color: #673AB7;">
+  <a class="navbar-brand" href="#">Logo</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['./']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          Home
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['./design']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          Weave design
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]=" ['./maker']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          Pattern maker
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['./help']" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          Help
+        </a>
+      </li>
+    </ul>
+    <div class="">
+      <button class="btn btn-secondary mr-sm-2" (click)="login()" *ngIf="!loggedIn()">
         Login
       </button>
-  <button (click)="logout()" *ngIf="loggedIn()">
-        Logout
-      </button>
-
-      <div *ngIf="loggedIn()"><a [routerLink]="['user']" routerLinkActive="active">{{email}}</a></div>
-      <button (click)="getEmail()">Set email</button>
+      <div class="my-2 my-sm-0" *ngIf="loggedIn()">
+        <p style="display: inline; color: white;">Welcome: </p>
+        <a class="btn btn-secondary mr-4" [routerLink]="['user']" >{{email}}</a>
+        <button class="btn btn-secondary btn-sm mr-sm-2" (click)="logout()" *ngIf="loggedIn()">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
 </nav>
