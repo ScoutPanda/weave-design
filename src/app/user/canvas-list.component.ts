@@ -43,7 +43,7 @@ export class CanvasListComponent implements OnInit {
   {
     this.canvasService.removeCanvas(canvas)
         .subscribe(
-            result => alert("CanvasRemoved"),
+            result => alert("Canvas removed"),
             error => alert("Something went wrong!")
         );
   }
@@ -89,15 +89,22 @@ export class CanvasListComponent implements OnInit {
     this.shareddata.canvasId = canvas.canvasId;
   }
 
+  private setCanvases(canvases: CanvasModel[]){
+    if(canvases.length == 0){
+      this.noData = true;
+    }
+    else
+    {
+     this.canvases = canvases;  
+    }
+  }
+
   ngOnInit() {
     this.canvasService.getCanvases()
       .subscribe((
         canvases: CanvasModel[]) => {
-          this.canvases = canvases;
+          this.setCanvases(canvases);
         }
       );
-    if(this.canvases.length == 0){
-      this.noData = true;
-    }
   }
 }
