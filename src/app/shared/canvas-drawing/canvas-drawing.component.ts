@@ -99,6 +99,7 @@ export class CanvasDrawingComponent implements OnInit {
       this.verCPArray = this.shareddata.verCPArray !== null ? this.shareddata.verCPArray : this.verCPArray;
       this.shareddata.hasInitialData = false;
       this.hadInitialData = true;
+      localStorage.setItem("isDirty", "true");
     }
   }
 
