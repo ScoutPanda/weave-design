@@ -1,0 +1,17 @@
+<div class="ml-3">
+  <h3>Canvas list</h3>
+  <ul *ngIf="!noData">
+    <li class="mt-2" *ngFor="let canvas of canvases; let i = index">
+      <span>{{i}}.  {{canvas.canvasName}}</span>
+      <span>Edit in: </span>
+      <a class="btn btn-secondary btn-sm" (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
+        Weave design
+      </a>
+      <a class="btn btn-secondary btn-sm ml-2" (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
+        Pattern maker
+      </a>
+      <button class="btn btn-danger btn-sm ml-3" (click)=remove(canvas)>remove</button>
+    </li>
+  </ul>
+  <h4 *ngIf="noData">No canvas data found. What are you waiting for? Go and make something! :)</h4>
+</div>

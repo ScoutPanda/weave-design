@@ -1,5 +1,5 @@
 <div id="canvasDrawingContainer">
-  <div id="createNewCanvas">
+  <div class="createNewCanvas" id="createNewCanvas">
     <label class="mr-1" *ngIf="!isDesign" for="shaft">Shaft (threads):</label>
     <input #shaft [hidden]="isDesign" class="textboxHighlight mxw-5" type="number" min="1" max="100" id="shaft" [(ngModel)]="visibleShaft" >
     <label class="mr-1" for="heddles">Heddles (width):</label>
@@ -11,60 +11,54 @@
     </button>
   </div>
   <hr>
-  <div id="toolbelt" *ngIf="executeClicked !== false">
-    <table>
+  <button class="btn btn-outline-primary btn-sm" style="position: fixed; z-index: 1;" data-toggle="collapse" data-target="#toolbelt" aria-expanded="true" (click)="hideMenuClicked = !hideMenuClicked" [hidden]="!executeClicked"><span [hidden]="hideMenuClicked">Hide menu</span><span [hidden]="!hideMenuClicked">Show menu</span></button>
+  <div class="containerLeft collapse show" style="margin-top: 30px;" id="toolbelt" [hidden]="!executeClicked">
+    <table style="display: block">
       <tr>
         <th>
           Menu
         </th>
       </tr>
       <table>
+        <tr *ngIf="isDesign">
+          <td>
+            <button class="btn btn-secondary" style="margin-bottom: 5px" (click)="makeDesign()">
+              Make design
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Visual changes
+          </th>
+        </tr>
         <tr>
           <td>
             <input #rectSize class="textboxHighlight mxw-5" type="number" id="size" [(ngModel)]="visibleRectSize">
-            <button class="btn btn-sm ml-1" (click)="changeRectSize(rectSize.value)">
+            <button class="btn btn-outline-primary btn-sm ml-1" (click)="changeRectSize(rectSize.value)">
               Change size
             </button>
           </td>
-          <td>
-            <a class="btn btn-primary" *ngIf="isDesign" (click)="shareData()" [routerLink]=" ['/maker']" routerLinkActive="active">
-              Pattern maker
-            </a>
-            <a class="btn btn-primary" *ngIf="!isDesign" (click)="shareData()" [routerLink]=" ['/design']" routerLinkActive="active">
-              Weave design
-            </a>
-          </td>
+        </tr>
+        <tr *ngIf="!isDesign">
+          <input #updateShaft class="textboxHighlight mxw-5" type="number" id="updateShaft" [(ngModel)]="visibleShaft">
+          <button class="btn btn-outline-primary btn-sm ml-1" (click)="changeShaftSize(updateShaft.value)">
+            update shaft
+          </button>
         </tr>
         <tr>
           <td>
-            <button class="btn btn-sm" (click)="showReverse()">
+            <button class="btn btn-outline-primary btn-sm" (click)="showReverse()">
               show reverse
             </button>
-          </td>
-          <td>
-            <button class="btn btn-sm" *ngIf="!isDesign" (click)="updateShaft()">
-              update shaft
-            </button>
-            <button class="btn btn-sm" *ngIf="isDesign" (click)="makeDesign()">
-              make design
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <a href="#" class="btn btn-primary btn-sm" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download canvas image</a>
-          </td>
-          <td>
-            <label *ngIf="!loggedIn()" style="max-width:130px">You need to be logged in to save</label>
-            <button class="btn btn-primary" id="saveToUser" *ngIf="loggedIn()" data-toggle="modal" data-target="#exampleModal">Save!</button>
           </td>
         </tr>
       </table>
     </table>
-    <table>
+    <table style="display: block">
       <tr>
         <th>
-          Colors
+          Color options
         </th>
       </tr>
       <table>
@@ -73,24 +67,24 @@
             <button type="button" class="btn btn-outline-primary btn-sm" [(colorPicker)]="horColor" [cpPresetColors]="horCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetterHor($event)"><i class="material-icons" [style.color]="horColor">color_lens</i>Warp</button>
           </td>
           <td>
-            <button type="button" class="btn btn-outline-primary btn-sm" [(colorPicker)]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetterVer($event)"><i class="material-icons" [style.color]="verColor">color_lens</i>Weft</button>
+            <button class="btn btn-outline-primary btn-sm" (click)="fillHorColorRow()">
+              <i class="material-icons">format_color_fill</i>fill
+            </button>
           </td>
         </tr>
         <tr>
           <td>
-            <button class="btn btn-sm" (click)="fillHorColorRow()">
-              <i class="material-icons">format_color_fill</i>fill warp color
-            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm" [(colorPicker)]="verColor" [cpPresetColors]="verCPArray" [cpAlphaChannel]="'disabled'" (cpToggleChange)="presetColorSetterVer($event)"><i class="material-icons" [style.color]="verColor">color_lens</i>Weft</button>
           </td>
           <td>
-            <button class="btn btn-sm" (click)="fillVerColorRow()">
-              <i class="material-icons">format_color_fill</i>fill weft color
+            <button class="btn btn-outline-primary btn-sm" (click)="fillVerColorRow()">
+              <i class="material-icons">format_color_fill</i>fill
             </button>
           </td>
         </tr>
       </table>
     </table>
-    <table *ngIf="isAdditionMode">
+    <table *ngIf="isAdditionMode" style="display: block">
       <tr>
         <th>
           Add rows
@@ -138,7 +132,7 @@
         </tr>
       </table>
     </table>
-    <table *ngIf="!isAdditionMode">
+    <table *ngIf="!isAdditionMode" style="display: block">
       <tr>
         <th>
           Delete rows
@@ -186,8 +180,41 @@
         </tr>
       </table>
     </table>
+    <table style="display: block">
+      <tr>
+        <th>
+          Take canvas to:
+        </th>
+      </tr>
+      <tr>
+        <td>
+          <a class="btn btn-outline-primary btn-sm" *ngIf="isDesign" (click)="shareData()" [routerLink]=" ['/maker']" routerLinkActive="active">
+            Pattern maker
+          </a>
+          <a class="btn btn-outline-primary btn-sm" *ngIf="!isDesign" (click)="shareData()" [routerLink]=" ['/design']" routerLinkActive="active">
+            Weave design
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Other actions
+        </th>
+      </tr>
+      <tr>
+        <td>
+          <a href="#" class="btn btn-outline-primary btn-sm" id="btn-download" download="my-file-name.png" (click)="saveToPng()">Download canvas image</a>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label *ngIf="!loggedIn()" style="max-width:130px">You need to be logged in to save</label>
+          <button class="btn btn-secondary" id="saveToUser" *ngIf="loggedIn()" data-toggle="modal" data-target="#exampleModal">Save!</button>
+        </td>
+      </tr>
+    </table>
   </div>
-  <div class="designContainer" [hidden]="!executeClicked">
+  <div class="designContainer containerRight" style="margin-top: 50px;" [hidden]="!executeClicked">
     <div id="canvasContainerUp">
         <canvas id="horColorCanvas" width="0" height="0" (click)="horColorBarListener($event)">
         </canvas>
@@ -223,7 +250,7 @@
       </div>
       <div class="modal-body text-center">
         <p>Enter the name for your canvas</p>
-        <input #canvasName class="textboxHighlight" style="width:80%" type="text" id="canvasName" placeholder="Write canvas name here" [(ngModel)]="visibleCanvasName" />
+        <input #canvasName class="textboxHighlight" style="width:80%" type="text" id="canvasName" placeholder="Write canvas name here" maxlength="50" [(ngModel)]="visibleCanvasName" />
       </div>
       <div *ngIf="!saveSuccess">
         <p>You have too many saved canvases, one user can only save 10 canvases at a time</p>

@@ -7,23 +7,7 @@ import { CompressService } from '../services/compress.service';
 
 @Component({
   selector: 'app-canvas-list',
-  template: `
-  <div class="ml-3">
-    <h3>Canvas list</h3>
-      <ul *ngIf="!noData">
-        <li *ngFor="let canvas of canvases">
-          <span>{{canvas.canvasName}}</span><button (click)=remove(canvas)>remove</button>
-          <a (click)="takeCanvasToDesign(canvas, true)" [routerLink]=" ['/design']" routerLinkActive="active">
-            Weave design
-          </a>
-          <a (click)="takeCanvasToDesign(canvas, false)" [routerLink]=" ['/maker']" routerLinkActive="active">
-            Pattern maker
-          </a>
-        </li>
-      </ul>
-      <h4 *ngIf="noData">No canvas data found. What are you waiting for? Go and make something! :)</h4>
-    </div>
-  `,
+  templateUrl: './canvas-list.component.html',
 })
 export class CanvasListComponent implements OnInit {
 
@@ -35,17 +19,18 @@ export class CanvasListComponent implements OnInit {
     private canvasService: CanvasService,
     private shareddata: SharedDataService,
     private compressService: CompressService
-  ) {
-    //this.canvases[0] = this.shareddata.canvas;
-  }
+  ) {}
 
   public remove(canvas: CanvasModel)
   {
-    this.canvasService.removeCanvas(canvas)
+    if(confirm("Are you sure you want to delete this canvas?")){
+      
+      this.canvasService.removeCanvas(canvas)
         .subscribe(
             result => alert("Canvas removed"),
             error => alert("Something went wrong!")
         );
+    }
   }
 
   public takeCanvasToDesign(canvas: CanvasModel, toDesign: boolean){

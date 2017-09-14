@@ -39,6 +39,8 @@ export class CanvasDrawingComponent implements OnInit {
   private verMax: number = 2;
   private padding: number = 5;
 
+  public hideMenuClicked: boolean = false;
+
   public saveSuccess: boolean = true;
 
   private ctxObject = {} as CanvasCtxInterface;
@@ -152,9 +154,15 @@ export class CanvasDrawingComponent implements OnInit {
         this.visibleShaft = shaft;
         this.updateShaft();
       }
-      alert("Shaft needs to be between 1 and 100");
+      else
+      {
+        alert("Shaft needs to be between 1 and 100");      
+      }
     }
-    alert("Shaft needs to be a number");
+    else
+    {
+      alert("Shaft needs to be a number"); 
+    }
   }
 
   public updateShaft(){
@@ -455,26 +463,32 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public makeDesign(){
-    let horUniqueArray = this.fillHorUniqueArray();
-    let verUniqueArray = this.fillVerUniqueArray();
-    let temp = this.canvasDrawingService.makeDesignArray(horUniqueArray);
-    let horArray = temp.array;
-    this.horMax = temp.count;
-    temp = this.canvasDrawingService.makeDesignArray(verUniqueArray);
-    let verArray = temp.array;
-    this.verMax = temp.count;
+    if(!this.isMainCanvasEmpty()){
+      let horUniqueArray = this.fillHorUniqueArray();
+      let verUniqueArray = this.fillVerUniqueArray();
+      let temp = this.canvasDrawingService.makeDesignArray(horUniqueArray);
+      let horArray = temp.array;
+      this.horMax = temp.count;
+      temp = this.canvasDrawingService.makeDesignArray(verUniqueArray);
+      let verArray = temp.array;
+      this.verMax = temp.count;
 
-    this.verCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.height, this.verMax);
-    this.horCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.horMax, this.width);
-    this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.horMax, this.verMax);
+      this.verCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.height, this.verMax);
+      this.horCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.horMax, this.width);
+      this.resultCanvasArray = this.canvasDrawingService.prepare2DArray(Array(), this.horMax, this.verMax);
 
-    this.verCanvasArray = this.compressService.decompressVerCanvasArray(verArray, this.verCanvasArray);
-    this.horCanvasArray = this.compressService.decompressHorCanvasArray(horArray, this.horCanvasArray);
-    this.resultCanvasArray = this.compressService.decompressResultCanvasArray(horArray, verArray, this.mainCanvasArray, this.resultCanvasArray);
+      this.verCanvasArray = this.compressService.decompressVerCanvasArray(verArray, this.verCanvasArray);
+      this.horCanvasArray = this.compressService.decompressHorCanvasArray(horArray, this.horCanvasArray);
+      this.resultCanvasArray = this.compressService.decompressResultCanvasArray(horArray, verArray, this.mainCanvasArray, this.resultCanvasArray);
 
-    this.drawHorCanvas();
-    this.drawVerCanvas();
-    this.drawResultCanvas();
+      this.drawHorCanvas();
+      this.drawVerCanvas();
+      this.drawResultCanvas();
+    }
+    else
+    {
+      alert("Cannot make design when canvas is empty.");  
+    }
   }
 
   private fillHorUniqueArray(): number[] {
@@ -1022,15 +1036,22 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   public createNewCanvas(shaft: number, width: number, height: number){
-    if(this.isDesign){
-      shaft = 2;
-    }
     if(isNumeric(shaft) && isNumeric(width), isNumeric(height)){
       if(shaft > 0 && shaft < 101 && width > 0 && width < 501 && height > 0 && height < 501){
-        this.shaft = shaft;
-        this.width = width;
-        this.height = height;
-        this.execute();
+        if(!this.executeClicked){
+          this.setNewCanvasDataAndExecute(shaft, width, height);
+          return;
+        }
+        if(!this.isMainCanvasEmpty()){
+          if(confirm("Are you sure you want to create new canvas? It will destroy the existing one.")){    
+            this.setNewCanvasDataAndExecute(shaft, width, height);
+          }
+          else
+          {
+            return;
+          }
+        }
+        this.setNewCanvasDataAndExecute(shaft, width, height);
       }
       else
       {
@@ -1041,6 +1062,16 @@ export class CanvasDrawingComponent implements OnInit {
     {
       alert("Shaft, heddles and lines have to be numbers");
     }
+  }
+
+  private setNewCanvasDataAndExecute(shaft: number, width: number, height: number){
+    if(this.isDesign){
+      shaft = 2;
+    }
+    this.shaft = shaft;
+    this.width = width;
+    this.height = height;
+    this.execute();
   }
 
   public shareData(){

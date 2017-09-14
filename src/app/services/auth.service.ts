@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { tokenNotExpired } from 'angular2-jwt';
+import { Router } from "@angular/router";
 
 declare var Auth0Lock: any;
 
@@ -11,7 +12,6 @@ export class AuthService {
     loginAfterSignUp: false,
     auth: {
       redirect: false
-      //redirectUrl: 'http://localhost:4200/callback'
     },
     languageDictionary: {
       success: {
@@ -26,7 +26,7 @@ export class AuthService {
     this.options
   )
 
-  constructor() {
+  constructor(private router: Router) {
     
   }
 
@@ -50,9 +50,13 @@ export class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('profile');
     localStorage.removeItem('email');
-    /*this.lock.logout({
+    this.isInUserMenu();
+  }
 
-    })*/
+  isInUserMenu(){
+    if(this.router.isActive("/user", true)){
+      this.router.navigate(['/']);
+    }
   }
 
   getUser(){
