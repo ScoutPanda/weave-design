@@ -14,11 +14,6 @@
   <button class="btn btn-outline-primary btn-sm" style="position: fixed; z-index: 1;" data-toggle="collapse" data-target="#toolbelt" aria-expanded="true" (click)="hideMenuClicked = !hideMenuClicked" [hidden]="!executeClicked"><span [hidden]="hideMenuClicked">Hide menu</span><span [hidden]="!hideMenuClicked">Show menu</span></button>
   <div class="containerLeft collapse show" style="margin-top: 30px;" id="toolbelt" [hidden]="!executeClicked">
     <table style="display: block">
-      <tr>
-        <th>
-          Menu
-        </th>
-      </tr>
       <table>
         <tr *ngIf="isDesign">
           <td>
