@@ -30,6 +30,9 @@
           <th>
             Visual changes
           </th>
+          <th id="fixedMenu" *ngIf="!isDesign">
+            <input type="checkbox" (change)="isMenuFixed = !isMenuFixed" [checked]="isMenuFixed" />
+          </th>
         </tr>
         <tr>
           <td>
