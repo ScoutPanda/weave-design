@@ -11,8 +11,9 @@
     </button>
   </div>
   <hr>
-  <button class="btn btn-outline-primary btn-sm" style="position: fixed; z-index: 1;" data-toggle="collapse" data-target="#toolbelt" aria-expanded="true" (click)="hideMenuClicked = !hideMenuClicked" [hidden]="!executeClicked"><span [hidden]="hideMenuClicked">Hide menu</span><span [hidden]="!hideMenuClicked">Show menu</span></button>
-  <div class="containerLeft collapse show" style="margin-top: 30px;" id="toolbelt" [hidden]="!executeClicked">
+  <div class="containerLeft" [ngStyle]="{'position': isMenuFixed ? 'fixed' : ''}" [hidden]="!executeClicked">
+  <button class="btn btn-primary btn-sm toggleMenu" data-toggle="collapse" data-target="#toolbelt" aria-expanded="true" (click)="hideMenuClicked = !hideMenuClicked" [hidden]="!executeClicked"><span [hidden]="hideMenuClicked">Hide menu</span><span [hidden]="!hideMenuClicked">Show menu</span></button>
+  <div class="menu collapse show" id="toolbelt">
     <table style="display: block">
       <table>
         <tr *ngIf="isDesign">
@@ -20,6 +21,9 @@
             <button class="btn btn-secondary" style="margin-bottom: 5px" (click)="makeDesign()">
               Make design
             </button>
+          </td>
+          <td id="fixedMenu">
+            <input type="checkbox" (change)="isMenuFixed = !isMenuFixed" [checked]="isMenuFixed" />
           </td>
         </tr>
         <tr>
@@ -208,6 +212,7 @@
         </td>
       </tr>
     </table>
+  </div>
   </div>
   <div class="designContainer containerRight" style="margin-top: 50px;" [hidden]="!executeClicked">
     <div id="canvasContainerUp">

@@ -57,6 +57,7 @@ export class CanvasDrawingComponent implements OnInit {
   public visibleShaft: number = 2;
   public visibleRectSize: number = 14;
   public visibleCanvasName: string = "";
+  public isMenuFixed: boolean = false;
 
   public horCPArray: any[] = ['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)'];
   public verCPArray: any[] = ['#fff', '#000', '#2889e9', '#e920e9', '#fff500', 'rgb(236,64,64)'];
@@ -195,7 +196,6 @@ export class CanvasDrawingComponent implements OnInit {
       let mainCanvasArray = this.compressService.prepare2DArray(this.height, this.width);
       this.mainCanvasArray = this.compressService.constructMainCanvasArray(compressedVerCanvasArray, compressedHorCanvasArray, this.resultCanvasArray, mainCanvasArray);
       
-      //this.checkIfMainCanvasMatchesSides();
       this.drawMainCanvas();
     }
 
@@ -1065,10 +1065,15 @@ export class CanvasDrawingComponent implements OnInit {
   }
 
   private setNewCanvasDataAndExecute(shaft: number, width: number, height: number){
-    if(this.isDesign){
-      shaft = 2;
+    if(this.isDesign)
+    {
+      this.shaft = 2;
+      this.updateHorMaxAndVerMax();
     }
-    this.shaft = shaft;
+    else
+    {
+      this.shaft = shaft;
+    }
     this.width = width;
     this.height = height;
     this.execute();

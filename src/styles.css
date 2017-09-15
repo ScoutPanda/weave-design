@@ -27,7 +27,6 @@ hr{
 }
 
 #info{
-  padding-top: 20px;
   padding-left: 20px;
 }
 
@@ -51,6 +50,19 @@ hr{
 .btn-outline-primary:hover{
   background-color: #673AB7;
   border-color: #673AB7;
+  box-shadow: 0 1px 3px 0 #311B92;
+}
+
+.btn-primary{
+  background-color: #673AB7;
+  border-color: #673AB7;
+  box-shadow: 0 2px 5px 0 #311B92;
+  color: #fff;
+}
+
+.btn-primary:hover{
+  background-color: #512DA8;
+  border-color: #512DA8;
   box-shadow: 0 1px 3px 0 #311B92;
 }
 
@@ -92,17 +104,6 @@ hr{
 
 .containerLeft{
   float: left;
-  position: fixed;
-  padding-left: 20px;
-  padding-top: 10px;
-  padding-right: 10px;
-  padding-bottom: 20px;
-  background-color: #FAFAFA;
-  box-shadow: 0 0 6px 0 #311B92;
-}
-
-.containerRight{
-  margin-left: 230px;
 }
 
 .createNewCanvas{
@@ -110,7 +111,32 @@ hr{
 }
 
 .navbar{
-  position: sticky;
+  position: fixed;
   top: 0;
   width: 100%;
+}
+
+.menu{
+  padding-top: 15px;
+  padding-left: 20px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  background-color: #FAFAFA;
+  box-shadow: 0 0 6px 0 #311B92;
+}
+
+.toggleMenu{
+  padding-left: 10px;
+}
+
+@media (min-width: 380px){
+  .containerRight{
+    margin-left: 230px;
+  }
+}
+
+@media (max-width: 449px){
+  #fixedMenu{
+    display: none;
+  }
 }
