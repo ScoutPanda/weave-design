@@ -27,7 +27,7 @@ export class CanvasListComponent implements OnInit {
       
       this.canvasService.removeCanvas(canvas)
         .subscribe(
-            result => alert("Canvas removed"),
+            result => alert("Canvas deleted."),
             error => alert("Something went wrong!")
         );
     }

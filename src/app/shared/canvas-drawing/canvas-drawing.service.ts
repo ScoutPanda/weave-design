@@ -54,7 +54,7 @@ export class CanvasDrawingService {
     }, { set: {}, count: 0, array});
   }
 
-    public compressColorData(targetArray: string[], targetArray2: string[], mappedHorColors: number[] = [],
+  public compressColorData(targetArray: string[], targetArray2: string[], mappedHorColors: number[] = [],
     colorDataMap: string[] = [], set: object = {}, mappedVerColors: number[] = null, count: number = 0){
     if(targetArray === null){
       targetArray = targetArray2;
